@@ -53,10 +53,15 @@ type SyncRequest struct {
 
 type SyncResponse struct {
 	CapabilityProfile capability.Profile `json:"capability_profile"`
-	SessionConfig     *sessioncfg.Config `json:"session_config,omitempty"`
-	ServerTime        time.Time          `json:"server_time"`
-	NextSyncAfterSec  int                `json:"next_sync_after_sec"`
-	TrustState        string             `json:"trust_state,omitempty"`
+	// Nil means Cloud has no production session assigned to this Edge, and that is
+	// encoded as an explicit null rather than dropped: "no session" is an answer Edge
+	// acts on — it keeps its local config — not a missing value. With omitempty the
+	// two were indistinguishable on the wire, which forced Cloud to mirror this
+	// struct locally just to say null.
+	SessionConfig    *sessioncfg.Config `json:"session_config"`
+	ServerTime       time.Time          `json:"server_time"`
+	NextSyncAfterSec int                `json:"next_sync_after_sec"`
+	TrustState       string             `json:"trust_state,omitempty"`
 }
 
 type TelemetryUploadRequest struct {

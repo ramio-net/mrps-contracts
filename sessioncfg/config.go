@@ -100,8 +100,13 @@ func DefaultForProfile(profile capability.Profile) Config {
 			SampleRate:  48000,
 			BitrateKbps: 128,
 		},
-		Cameras:      Cameras{MaxCameras: profile.Limits.MaxCameras},
-		Transport:    TransportFile,
+		Cameras: Cameras{MaxCameras: profile.Limits.MaxCameras},
+		// LIVE, not FILE. Measured on one clean-network run, one camera, 120 ms
+		// buffer: LIVE 203 ms latency and 7,6 ms arrival jitter against FILE 274 and
+		// 14,6. The TSBPD window is not overhead, it is smoothing. Confirmed by a
+		// field A/B on a bad network, where LIVE held at 360 ms and FILE barely held
+		// at 400. FILE stays in the contract as the fallback path, not as the default.
+		Transport:    TransportLive,
 		SRTLatencyMs: 120,
 		Operational:  DefaultOperational(video),
 	}
@@ -130,6 +135,20 @@ func DefaultOperational(v Video) Operational {
 	}
 }
 
+// RecommendedPlayoutMs is the starting playout delay for a video config: more
+// resolution and bitrate mean more airtime pressure, more arrival jitter, and more
+// buffer needed to keep several cameras aligned.
+//
+// The floor is 280 ms because two real handsets said so. Measured 2026-07-29 on a
+// two-camera run at 720p30: one model was clean from 280 ms, the other from 240.
+// The buffer is one for the whole session and is set by the worst camera, so 280 is
+// the value at which both are clean. The earlier floor of 180 came from a
+// single-camera calibration and was below what multi-camera actually needs — a
+// session started there spends its first minutes repeating frames while the operator
+// hunts for the knob.
+//
+// This is only the sensible starting point. The operator knob and the history-based
+// per-device recommendation on Edge sit above it.
 func RecommendedPlayoutMs(v Video) int {
 	base := 200
 	if v.Height >= 1080 {
@@ -139,8 +158,8 @@ func RecommendedPlayoutMs(v Video) int {
 		base += (v.BitrateKbps - 3300) * 15 / 1000
 	}
 	ms := ((base + 10) / 20) * 20
-	if ms < 180 {
-		return 180
+	if ms < 280 {
+		return 280
 	}
 	if ms > 400 {
 		return 400

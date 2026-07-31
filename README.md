@@ -27,7 +27,7 @@
 | `capability` | Capability Profile v2, канонизация RFC 8785, подпись Ed25519, golden-вектора |
 | `sessioncfg` | SessionConfig v2, границы значений (взяты из работающего Edge), значения по умолчанию |
 | `health` | DTO телеметрии: снимок состояния камеры и вычисленное состояние |
-| `protocol` | HMAC-подпись запросов Edge → Cloud, конверты сообщений |
+| `protocol` | HMAC-подпись запросов Edge → Cloud, конверты сообщений, `SessionReport` |
 
 ## Использование
 
