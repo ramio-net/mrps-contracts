@@ -1,9 +1,6 @@
 package protocol
 
-import (
-	"github.com/ramio-net/mrps-contracts/capability"
-	"github.com/ramio-net/mrps-contracts/sessioncfg"
-)
+import "encoding/json"
 
 // Outcome values accepted by Cloud (OpenAPI SessionReport.outcome).
 const (
@@ -52,12 +49,28 @@ type SessionReport struct {
 	// describe two different handsets and two different diagnoses. Kept out of
 	// CameraReport because the buffer is one for the whole session, set by the worst
 	// camera.
-	PlayoutDelayMs int `json:"playout_delay_ms,omitempty"`
+	//
+	// A pointer, because "an Edge too old to report it" and "reported as zero" are
+	// different facts and Cloud keeps the column nullable to say so. A plain int would
+	// make every old report claim the session ran at a zero-millisecond buffer.
+	PlayoutDelayMs *int `json:"playout_delay_ms,omitempty"`
 
-	ConfigSnapshot     *sessioncfg.Config  `json:"config_snapshot,omitempty"`
-	CapabilitySnapshot *capability.Profile `json:"capability_snapshot,omitempty"`
-	Cameras            []CameraReport      `json:"cameras"`
-	Warnings           []string            `json:"warnings,omitempty"`
+	// ConfigSnapshot and CapabilitySnapshot are carried, not interpreted. Their shape
+	// belongs to the Edge that produced them — Edge builds the config snapshot from its
+	// own sessioncfg, which is not this module's — so the wire type is raw JSON and both
+	// sides move the bytes unchanged.
+	//
+	// They were typed structs in v0.2.0, and that was a mistake with a measured cost:
+	// decoding into a typed struct and re-encoding to store it invented fields the Edge
+	// never sent (an "operational" block asserting playout_delay_ms: 0 in a record whose
+	// whole purpose is to say what the delay was) and silently dropped fields this module
+	// did not know yet. A report is an immutable record of one broadcast; normalising it
+	// through whichever contract version the reader happens to run makes it evidence of
+	// the reader, not of the broadcast.
+	ConfigSnapshot     json.RawMessage `json:"config_snapshot,omitempty"`
+	CapabilitySnapshot json.RawMessage `json:"capability_snapshot,omitempty"`
+	Cameras            []CameraReport  `json:"cameras"`
+	Warnings           []string        `json:"warnings,omitempty"`
 }
 
 // CameraReport is one camera's share of the session.
