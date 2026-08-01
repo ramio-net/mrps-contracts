@@ -6,12 +6,14 @@ import (
 	"testing"
 )
 
+func intPtr(v int) *int { return &v }
+
 func TestSessionReportWireShape(t *testing.T) {
 	report := SessionReport{
 		ReportID:       "report-7f3a",
 		DurationSec:    1591,
 		Outcome:        OutcomeCompleted,
-		PlayoutDelayMs: 280,
+		PlayoutDelayMs: intPtr(280),
 		Cameras: []CameraReport{{
 			DeviceKey:      "BP2A-1c9f4e07",
 			SlotIndex:      1,
@@ -44,11 +46,55 @@ func TestSessionReportWireShape(t *testing.T) {
 	if err := json.Unmarshal(raw, &back); err != nil {
 		t.Fatal(err)
 	}
-	if back.ReportID != report.ReportID || back.PlayoutDelayMs != report.PlayoutDelayMs {
+	if back.ReportID != report.ReportID || back.PlayoutDelayMs == nil || *back.PlayoutDelayMs != 280 {
 		t.Fatalf("round trip = %+v, want %+v", back, report)
 	}
 	if back.Cameras[0].CauseHistogram["late"] != 0.1 {
 		t.Fatalf("cause histogram lost its shares: %+v", back.Cameras[0].CauseHistogram)
+	}
+}
+
+// An Edge too old to report the buffer must stay distinguishable from one that ran
+// at zero, because Cloud writes the column NULL for the first and a number for the
+// second. With a plain int the two collapse and every old report reads as a session
+// with no buffer at all.
+func TestSessionReportKeepsMissingPlayoutDelayDistinct(t *testing.T) {
+	var back SessionReport
+	if err := json.Unmarshal([]byte(`{"report_id":"r","duration_sec":10,"outcome":"completed","cameras":[]}`), &back); err != nil {
+		t.Fatal(err)
+	}
+	if back.PlayoutDelayMs != nil {
+		t.Fatalf("absent playout_delay_ms = %v, want nil", *back.PlayoutDelayMs)
+	}
+}
+
+// The snapshots are evidence, not data this module owns. Whatever Edge put in them
+// has to survive a decode/encode round trip byte for byte, including fields added by
+// an Edge newer than the reader — v0.2.0 typed these and silently rewrote both.
+func TestSessionReportSnapshotsSurviveUnchanged(t *testing.T) {
+	sent := `{"session_id":"local-registered","transport":"live","srt_latency_ms":120,"experimental_knob":42}`
+	body := []byte(`{"report_id":"r","duration_sec":10,"outcome":"completed",` +
+		`"config_snapshot":` + sent + `,"cameras":[]}`)
+
+	var back SessionReport
+	if err := json.Unmarshal(body, &back); err != nil {
+		t.Fatal(err)
+	}
+	if string(back.ConfigSnapshot) != sent {
+		t.Fatalf("snapshot decoded to %s, want the bytes Edge sent", back.ConfigSnapshot)
+	}
+
+	raw, err := json.Marshal(back)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(raw), `"experimental_knob":42`) {
+		t.Fatalf("unknown field did not survive re-encoding: %s", raw)
+	}
+	for _, invented := range []string{"schema_version", "operational"} {
+		if strings.Contains(string(raw), invented) {
+			t.Fatalf("re-encoding invented %q: %s", invented, raw)
+		}
 	}
 }
 
