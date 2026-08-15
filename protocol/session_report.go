@@ -71,6 +71,17 @@ type SessionReport struct {
 	CapabilitySnapshot json.RawMessage `json:"capability_snapshot,omitempty"`
 	Cameras            []CameraReport  `json:"cameras"`
 	Warnings           []string        `json:"warnings,omitempty"`
+
+	// Timeline is the per-minute course of the session: the same quantities as the
+	// aggregates above, but as a series, plus what the operator did, as events. See its
+	// own doc for why it exists — briefly, the aggregates could say what a broadcast
+	// cost but never when, and until the accumulator that fills this, they were also
+	// measuring the wrong window.
+	//
+	// Optional: absent from a report written by an Edge too old to record one, and
+	// absent from a session that ended before the first bucket closed. A reader must
+	// treat nil as "not recorded", never as an empty session.
+	Timeline *Timeline `json:"timeline,omitempty"`
 }
 
 // CameraReport is one camera's share of the session.
