@@ -98,11 +98,114 @@ type SyncResponse struct {
 }
 
 type TelemetryUploadRequest struct {
-	InstallationID string                        `json:"installation_id"`
-	EdgeID         string                        `json:"edge_id"`
-	SessionID      string                        `json:"session_id"`
-	Seq            int64                         `json:"seq"`
-	Snapshots      []health.DeviceHealthSnapshot `json:"snapshots"`
+	InstallationID string `json:"installation_id"`
+	EdgeID         string `json:"edge_id"`
+	// SessionID is OPTIONAL. A field broadcast runs without a Cloud session at all —
+	// that is the normal case, not a degraded one — and when it is absent the
+	// installation and organization come from the signed credentials. When present
+	// it must be a real production_sessions UUID and nothing else: there is no
+	// foreign key on telemetry_snapshots, so putting an edge id here would be
+	// accepted in silence and file the readings under a session that never existed.
+	SessionID string `json:"session_id,omitempty"`
+	// StreamID identifies one run of the sender, so a late packet from a previous
+	// run cannot overwrite a newer one. Restarting Edge starts a new StreamID.
+	StreamID string `json:"stream_id,omitempty"`
+	// Seq is monotonic within one StreamID. A retry repeats the same pair with the
+	// same payload; the same pair with different content is a conflict, not an
+	// update.
+	Seq int64 `json:"seq"`
+	// Snapshots may be EMPTY. An empty batch means "Edge is here, no cameras" and
+	// is the difference between silence and idleness — a distinction the console
+	// cannot make from an absent request.
+	Snapshots []health.DeviceHealthSnapshot `json:"snapshots"`
+	// Runtime is what is true right now, as opposed to the snapshots, which may be
+	// a backlog delivered after a venue came back online. Every upload carries a
+	// fresh Runtime; a replayed backlog must never be read as the current picture.
+	Runtime *EdgeRuntime `json:"runtime,omitempty"`
+}
+
+// Session states an Edge reports. Grace is a session whose cameras have all left
+// but which has not been declared over yet.
+const (
+	SessionStateIdle   = "idle"
+	SessionStateActive = "active"
+	SessionStateGrace  = "grace"
+)
+
+// EdgeRuntime is the venue's current state, separate from accumulated readings.
+//
+// The camera list is complete rather than incremental on purpose: a full list can
+// show a camera has gone, a stream of additions cannot.
+type EdgeRuntime struct {
+	// ObservedAt is the Edge's own clock. Liveness is judged by the server's receipt
+	// time instead — a venue's clock is not something to trust, we have measured it.
+	ObservedAt time.Time `json:"observed_at"`
+	UptimeSec  int       `json:"uptime_sec"`
+	// LocalSessionID is opaque and local. It is NOT a Cloud session id and must not
+	// be stored as one.
+	LocalSessionID string `json:"local_session_id,omitempty"`
+	// SessionState is one of the constants above. A reader must tolerate values it
+	// does not know rather than fall back to idle: an unknown state is unknown, and
+	// claiming "no broadcast" while one is running is the worse error.
+	SessionState string `json:"session_state"`
+	// PlayoutMs is the deadline the held rates are measured against. Without it a
+	// stored reading cannot be compared with any other.
+	PlayoutMs *int            `json:"playout_ms,omitempty"`
+	Cameras   []RuntimeCamera `json:"cameras"`
+	// AUX sources are a separate list, never cameras with an invented slot index.
+	// An AUX source at 5 fps holds about 0.8 of its frames by construction, and in
+	// camera statistics that reads as the worst camera in the park forever.
+	AUX []RuntimeAUX `json:"aux,omitempty"`
+	// Capability is what Edge observes about its own permissions. It grants nothing
+	// and replaces no signature — Cloud decides rights, Edge reports what it applied.
+	Capability *CapabilityState `json:"capability,omitempty"`
+}
+
+type RuntimeCamera struct {
+	DeviceID     string `json:"device_id"`
+	SlotIndex    int    `json:"slot_index"`
+	ConnectionID string `json:"connection_id,omitempty"`
+	Status       string `json:"status"`
+}
+
+type RuntimeAUX struct {
+	SourceID string  `json:"source_id"`
+	Label    string  `json:"label,omitempty"`
+	Status   string  `json:"status"`
+	FPS      float64 `json:"fps,omitempty"`
+}
+
+// Reasons the next session's capability set differs from the current one.
+const (
+	CapabilityNextFullAvailable        = "full_available"
+	CapabilityNextRightExpired         = "right_expired"
+	CapabilityNextOfflineWindowExpired = "offline_window_expired"
+	CapabilityNextBothExpired          = "both_expired"
+	CapabilityNextInvalidProfile       = "invalid_profile"
+	CapabilityNextRevoked              = "revoked"
+)
+
+// CapabilityState carries two observations, not two tariff modes.
+//
+// A broadcast already running keeps the set it started with, so "this session is
+// running on the full set while the next one will be free" is a correct state, not
+// a contradiction. Without both halves the console would show the free tier while
+// eight cameras are legitimately on air.
+type CapabilityState struct {
+	Current *CapabilitySet `json:"current,omitempty"`
+	// Next is absent while Edge cannot know it. Until the signed profile carries the
+	// set that applies after expiry, there is nowhere to read it from — and absent
+	// must be rendered as unknown, never as a copy of Current.
+	Next *CapabilitySet `json:"next,omitempty"`
+}
+
+type CapabilitySet struct {
+	Preset    string              `json:"preset"`
+	ProfileID string              `json:"profile_id,omitempty"`
+	Limits    capability.Limits   `json:"limits"`
+	Features  capability.Features `json:"features"`
+	// Reason is set on Next only, from the constants above.
+	Reason string `json:"reason,omitempty"`
 }
 
 type TelemetryUploadResponse struct {
