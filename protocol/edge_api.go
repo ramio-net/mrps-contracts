@@ -113,10 +113,19 @@ type SyncResponse struct {
 	// Absent when Cloud is answering a node that has not declared schema 3, in which
 	// case CapabilityProfile above carries schema 2 exactly as before.
 	CapabilityDocument json.RawMessage `json:"capability_document,omitempty"`
-	// SigningKeys is the trusted set this venue should hold, delivered so a new key
-	// can be distributed BEFORE anything is signed with it. Empty leaves the venue's
-	// current set untouched.
-	SigningKeys []SigningKey `json:"signing_keys,omitempty"`
+	// KeyManifest is the trusted key list, signed by the OFFLINE ROOT and carried as
+	// the exact bytes that were signed.
+	//
+	// Raised by Cloud in review and they were right: a plain list of keys inside an
+	// authenticated sync response is only as trustworthy as the service sending it.
+	// Whoever takes the running service could then install a key of their choosing and
+	// mint any entitlement — the capability signature would verify perfectly, against
+	// a key the attacker put there. The manifest is signed by a root that does not
+	// live in the Cloud runtime at all, so the sync channel carries it without being
+	// able to forge it.
+	//
+	// Absent leaves the venue's current set untouched.
+	KeyManifest json.RawMessage `json:"key_manifest,omitempty"`
 	// Nil means Cloud has no production session assigned to this Edge, and that is
 	// encoded as an explicit null rather than dropped: "no session" is an answer Edge
 	// acts on — it keeps its local config — not a missing value. With omitempty the
@@ -131,21 +140,6 @@ type SyncResponse struct {
 	ServerTime           time.Time `json:"server_time"`
 	NextSyncAfterSec     int       `json:"next_sync_after_sec"`
 	TrustState           string    `json:"trust_state,omitempty"`
-}
-
-// SigningKey is one public key a venue should trust.
-//
-// Retiring a key means dropping it from this list, and that is a separate deliberate
-// act from stopping to sign with it: a key still has to verify documents already
-// issued under it, or a rotation quietly puts an expiry on a free set that is
-// supposed to have none.
-type SigningKey struct {
-	KeyID string `json:"key_id"`
-	// PublicKey is base64 standard encoding of the raw Ed25519 public key.
-	PublicKey string `json:"public_key"`
-	// NotSigningAfter, when set, says this key is verify-only from that moment: still
-	// trusted for documents already carrying it, no longer expected on new ones.
-	NotSigningAfter *time.Time `json:"not_signing_after,omitempty"`
 }
 
 type TelemetryUploadRequest struct {

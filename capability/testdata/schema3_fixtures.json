@@ -62,299 +62,42 @@
     {
       "name": "tampered_free_cameras",
       "why": "the free set is inside the signature; raising it must break verification",
-      "document": {
-        "schema_version": 3,
-        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
-        "revision": 7,
-        "subject": {
-          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
-          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
-          "org_id": "10000000-0000-4000-8000-000000000001"
-        },
-        "issued_at": "2026-09-08T12:00:00Z",
-        "offline_window_sec": 604800,
-        "registered": {
-          "limits": {
-            "max_cameras": 40,
-            "config_editable": false
-          },
-          "features": {
-            "multi_stream": false,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3
-        },
-        "full": {
-          "limits": {
-            "max_cameras": 8,
-            "config_editable": true
-          },
-          "features": {
-            "multi_stream": true,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3,
-          "valid_from": "2026-09-08T12:00:00Z",
-          "valid_until": "2026-10-08T12:00:00Z"
-        },
-        "key_id": "fixture-0",
-        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
-      }
+      "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":40,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
     },
     {
       "name": "tampered_key_id",
       "why": "key_id is signed, so a document cannot be re-attributed to another key",
-      "document": {
-        "schema_version": 3,
-        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
-        "revision": 7,
-        "subject": {
-          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
-          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
-          "org_id": "10000000-0000-4000-8000-000000000001"
-        },
-        "issued_at": "2026-09-08T12:00:00Z",
-        "offline_window_sec": 604800,
-        "registered": {
-          "limits": {
-            "max_cameras": 4,
-            "config_editable": false
-          },
-          "features": {
-            "multi_stream": false,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3
-        },
-        "full": {
-          "limits": {
-            "max_cameras": 8,
-            "config_editable": true
-          },
-          "features": {
-            "multi_stream": true,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3,
-          "valid_from": "2026-09-08T12:00:00Z",
-          "valid_until": "2026-10-08T12:00:00Z"
-        },
-        "key_id": "other",
-        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
-      }
+      "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"other\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
     },
     {
       "name": "tampered_schema_version",
       "why": "schema_version is signed, so a document cannot be re-read as another schema",
-      "document": {
-        "schema_version": 4,
-        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
-        "revision": 7,
-        "subject": {
-          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
-          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
-          "org_id": "10000000-0000-4000-8000-000000000001"
-        },
-        "issued_at": "2026-09-08T12:00:00Z",
-        "offline_window_sec": 604800,
-        "registered": {
-          "limits": {
-            "max_cameras": 4,
-            "config_editable": false
-          },
-          "features": {
-            "multi_stream": false,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3
-        },
-        "full": {
-          "limits": {
-            "max_cameras": 8,
-            "config_editable": true
-          },
-          "features": {
-            "multi_stream": true,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3,
-          "valid_from": "2026-09-08T12:00:00Z",
-          "valid_until": "2026-10-08T12:00:00Z"
-        },
-        "key_id": "fixture-0",
-        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
-      }
+      "document": "{\"schema_version\":4,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
     },
     {
       "name": "duplicate_key",
       "why": "decoders disagree about which value wins, so the document has no single meaning",
-      "document": {
-        "schema_version": 3,
-        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
-        "revision": 7,
-        "revision": 9,
-        "subject": {
-          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
-          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
-          "org_id": "10000000-0000-4000-8000-000000000001"
-        },
-        "issued_at": "2026-09-08T12:00:00Z",
-        "offline_window_sec": 604800,
-        "registered": {
-          "limits": {
-            "max_cameras": 4,
-            "config_editable": false
-          },
-          "features": {
-            "multi_stream": false,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3
-        },
-        "full": {
-          "limits": {
-            "max_cameras": 8,
-            "config_editable": true
-          },
-          "features": {
-            "multi_stream": true,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3,
-          "valid_from": "2026-09-08T12:00:00Z",
-          "valid_until": "2026-10-08T12:00:00Z"
-        },
-        "key_id": "fixture-0",
-        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
-      }
+      "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"revision\":9,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
     },
     {
       "name": "missing_signature",
       "why": "an unsigned document grants nothing, including the free set it carries",
-      "document": {
-        "schema_version": 3,
-        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
-        "revision": 7,
-        "subject": {
-          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
-          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
-          "org_id": "10000000-0000-4000-8000-000000000001"
-        },
-        "issued_at": "2026-09-08T12:00:00Z",
-        "offline_window_sec": 604800,
-        "registered": {
-          "limits": {
-            "max_cameras": 4,
-            "config_editable": false
-          },
-          "features": {
-            "multi_stream": false,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3
-        },
-        "full": {
-          "limits": {
-            "max_cameras": 8,
-            "config_editable": true
-          },
-          "features": {
-            "multi_stream": true,
-            "studio_node_transport": false,
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "remote_control": false,
-            "telemetry_upload": true,
-            "operational_profile": false
-          },
-          "conditions_revision": 3,
-          "valid_from": "2026-09-08T12:00:00Z",
-          "valid_until": "2026-10-08T12:00:00Z"
-        },
-        "key_id": "fixture-0",
-        "signature": ""
-      }
+      "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"\"}"
     },
     {
-      "name": "no_registered_set",
-      "why": "without a usable free set the step down after expiry has nowhere to land",
-      "document": {
-        "full": {
-          "conditions_revision": 3,
-          "features": {
-            "edge_local_config_ui": false,
-            "mrps_console_sync": true,
-            "multi_stream": true,
-            "operational_profile": false,
-            "remote_control": false,
-            "studio_node_transport": false,
-            "telemetry_upload": true
-          },
-          "limits": {
-            "config_editable": true,
-            "max_cameras": 8
-          },
-          "valid_from": "2026-09-08T12:00:00Z",
-          "valid_until": "2026-10-08T12:00:00Z"
-        },
-        "issued_at": "2026-09-08T12:00:00Z",
-        "key_id": "fixture-0",
-        "offline_window_sec": 604800,
-        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
-        "revision": 7,
-        "schema_version": 3,
-        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==",
-        "subject": {
-          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
-          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
-          "org_id": "10000000-0000-4000-8000-000000000001"
-        }
-      }
+      "name": "no_usable_registered_set",
+      "why": "signature is VALID; the refusal must come from the free set being unusable, because without it the step down after expiry has nowhere to land",
+      "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":0,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"G3qj3cqDc/u05DsZUKjBNIRbB5AScd0WOuDrLyB3csQE/hxOOPmwsxZd2r2Bx1HkxJy1T6F6gS5KxGDeUHHKCQ==\"}"
+    },
+    {
+      "name": "registered_removed_after_signing",
+      "why": "the free set is inside the signature, so removing it must break verification",
+      "document": "{\"full\":{\"conditions_revision\":3,\"features\":{\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"multi_stream\":true,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":true,\"max_cameras\":8},\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":604800,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"schema_version\":3,\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\",\"subject\":{\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"}}"
+    },
+    {
+      "name": "trailing_content",
+      "why": "anything after the document is refused; a stray closing brace is not another value and must not be read as one",
+      "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}}"
     }
   ]
 }

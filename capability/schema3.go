@@ -89,6 +89,13 @@ type PaidCapabilitySetV3 struct {
 // disagree about which wins, and a document that means different things to the
 // signer and the verifier is not a document.
 func CanonicalBytesV3(raw []byte) ([]byte, error) {
+	return canonicalWithout(raw, "signature")
+}
+
+// canonicalWithout is shared by the capability document and the key manifest: both
+// are signed objects that exclude exactly one field, and both must refuse the same
+// malformed input.
+func canonicalWithout(raw []byte, omit string) ([]byte, error) {
 	if err := rejectDuplicateKeys(raw); err != nil {
 		return nil, err
 	}
@@ -98,14 +105,18 @@ func CanonicalBytesV3(raw []byte) ([]byte, error) {
 	if err := dec.Decode(&v); err != nil {
 		return nil, fmt.Errorf("parse capability document: %w", err)
 	}
-	if dec.More() {
+	// More() is not enough here, and Cloud's independent verifier caught it: for
+	// {"a":1}} the stray brace reads as a closing delimiter rather than as another
+	// value, so More() says there is nothing left and the garbage slips through.
+	// Demanding EOF is the only form that refuses everything after the document.
+	if _, err := dec.Token(); err != io.EOF {
 		return nil, fmt.Errorf("trailing content after capability document")
 	}
 	obj, ok := v.(map[string]any)
 	if !ok {
-		return nil, fmt.Errorf("capability document must be a JSON object")
+		return nil, fmt.Errorf("signed document must be a JSON object")
 	}
-	delete(obj, "signature")
+	delete(obj, omit)
 
 	var out bytes.Buffer
 	if err := writeCanonical(&out, obj); err != nil {
@@ -116,10 +127,7 @@ func CanonicalBytesV3(raw []byte) ([]byte, error) {
 
 // SigningInputV3 is what Ed25519 actually signs.
 func SigningInputV3(canonical []byte) []byte {
-	out := make([]byte, 0, len(signingDomainV3)+1+len(canonical))
-	out = append(out, signingDomainV3...)
-	out = append(out, 0)
-	return append(out, canonical...)
+	return signingInput(signingDomainV3, canonical)
 }
 
 // rejectDuplicateKeys walks the token stream, because encoding/json silently keeps

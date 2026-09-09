@@ -45,9 +45,12 @@ type schema3Fixtures struct {
 }
 
 type negativeVector struct {
-	Name     string          `json:"name"`
-	Why      string          `json:"why"`
-	Document json.RawMessage `json:"document"`
+	Name string `json:"name"`
+	Why  string `json:"why"`
+	// Document is the LITERAL bytes to feed a verifier, carried as a string because
+	// some vectors are deliberately malformed JSON and could not survive being stored
+	// as a JSON value.
+	Document string `json:"document"`
 }
 
 func fixtureKey() (ed25519.PrivateKey, ed25519.PublicKey) {
@@ -124,7 +127,7 @@ func negativeVectors(t *testing.T, signed []byte) []negativeVector {
 	t.Helper()
 	out := []negativeVector{}
 	add := func(name, why string, doc []byte) {
-		out = append(out, negativeVector{Name: name, Why: why, Document: json.RawMessage(doc)})
+		out = append(out, negativeVector{Name: name, Why: why, Document: string(doc)})
 	}
 
 	add("tampered_free_cameras",
@@ -143,18 +146,43 @@ func negativeVectors(t *testing.T, signed []byte) []negativeVector {
 		"an unsigned document grants nothing, including the free set it carries",
 		[]byte(strings.Replace(string(signed), `"signature":"`+extractSignature(signed)+`"`, `"signature":""`, 1)))
 
-	var noFree map[string]any
-	if err := json.Unmarshal(signed, &noFree); err != nil {
-		t.Fatal(err)
-	}
-	delete(noFree, "registered")
-	raw, err := json.Marshal(noFree)
+	// Signed PROPERLY with an unusable free set, so the refusal comes from the missing
+	// set and not from a broken signature. Cloud's independent verifier caught the
+	// first version of this vector: it was built by deleting the block from an already
+	// signed document, so it failed on the signature and proved nothing about the rule
+	// it was named for. A vector that passes for the wrong reason is worse than none —
+	// it reports agreement that was never tested.
+	priv, _ := fixtureKey()
+	empty := sampleV3()
+	empty.Registered.Limits.MaxCameras = 0
+	unusable, err := SignV3(empty, "fixture-0", priv)
 	if err != nil {
 		t.Fatal(err)
 	}
-	add("no_registered_set",
-		"without a usable free set the step down after expiry has nowhere to land",
+	add("no_usable_registered_set",
+		"signature is VALID; the refusal must come from the free set being unusable, "+
+			"because without it the step down after expiry has nowhere to land",
+		unusable)
+
+	// And separately: content removed after signing. This one must fail on the
+	// signature, and says so.
+	var stripped map[string]any
+	if err := json.Unmarshal(signed, &stripped); err != nil {
+		t.Fatal(err)
+	}
+	delete(stripped, "registered")
+	raw, err := json.Marshal(stripped)
+	if err != nil {
+		t.Fatal(err)
+	}
+	add("registered_removed_after_signing",
+		"the free set is inside the signature, so removing it must break verification",
 		raw)
+
+	add("trailing_content",
+		"anything after the document is refused; a stray closing brace is not "+
+			"another value and must not be read as one",
+		[]byte(string(signed)+"}"))
 
 	return out
 }
@@ -178,7 +206,7 @@ func TestNegativeVectorsAreAllRefused(t *testing.T) {
 	}
 	for _, v := range negativeVectors(t, signed) {
 		t.Run(v.Name, func(t *testing.T) {
-			if _, err := VerifyV3(v.Document, keys); err == nil {
+			if _, err := VerifyV3([]byte(v.Document), keys); err == nil {
 				t.Fatalf("vector %q was accepted; %s", v.Name, v.Why)
 			}
 		})
