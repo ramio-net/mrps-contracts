@@ -1,0 +1,360 @@
+{
+  "_note": "TEST VECTORS. The key below is derived from a constant in this repository and must never be trusted by a production verifier.",
+  "key": {
+    "key_id": "fixture-0",
+    "private_seed_utf8": "mrps-capability-schema-3-fixture-key-v1",
+    "public_key_base64": "txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE="
+  },
+  "valid": {
+    "document": {
+      "schema_version": 3,
+      "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
+      "revision": 7,
+      "subject": {
+        "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
+        "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
+        "org_id": "10000000-0000-4000-8000-000000000001"
+      },
+      "issued_at": "2026-09-08T12:00:00Z",
+      "offline_window_sec": 604800,
+      "registered": {
+        "limits": {
+          "max_cameras": 4,
+          "config_editable": false
+        },
+        "features": {
+          "multi_stream": false,
+          "studio_node_transport": false,
+          "edge_local_config_ui": false,
+          "mrps_console_sync": true,
+          "remote_control": false,
+          "telemetry_upload": true,
+          "operational_profile": false
+        },
+        "conditions_revision": 3
+      },
+      "full": {
+        "limits": {
+          "max_cameras": 8,
+          "config_editable": true
+        },
+        "features": {
+          "multi_stream": true,
+          "studio_node_transport": false,
+          "edge_local_config_ui": false,
+          "mrps_console_sync": true,
+          "remote_control": false,
+          "telemetry_upload": true,
+          "operational_profile": false
+        },
+        "conditions_revision": 3,
+        "valid_from": "2026-09-08T12:00:00Z",
+        "valid_until": "2026-10-08T12:00:00Z"
+      },
+      "key_id": "fixture-0",
+      "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
+    },
+    "canonical_json": "{\"full\":{\"conditions_revision\":3,\"features\":{\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"multi_stream\":true,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":true,\"max_cameras\":8},\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":604800,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"registered\":{\"conditions_revision\":3,\"features\":{\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":7,\"schema_version\":3,\"subject\":{\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"}}",
+    "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b2266756c6c223a7b22636f6e646974696f6e735f7265766973696f6e223a332c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a66616c73652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a747275652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a747275652c226d61785f63616d65726173223a387d2c2276616c69645f66726f6d223a22323032362d30392d30385431323a30303a30305a222c2276616c69645f756e74696c223a22323032362d31302d30385431323a30303a30305a227d2c226973737565645f6174223a22323032362d30392d30385431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226f66666c696e655f77696e646f775f736563223a3630343830302c2270726f66696c655f6964223a2239663165326433632d303030302d343030302d383030302d303030303030303030303031222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a332c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a66616c73652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a372c22736368656d615f76657273696f6e223a332c227375626a656374223a7b22656467655f6964223a2231353262396631372d353431302d343137382d613464332d643030613632633339353539222c22696e7374616c6c6174696f6e5f6964223a2236643739636231382d306461342d346631312d396536622d663664656665386532313165222c226f72675f6964223a2231303030303030302d303030302d343030302d383030302d303030303030303030303031227d7d",
+    "signature_base64": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
+  },
+  "negative": [
+    {
+      "name": "tampered_free_cameras",
+      "why": "the free set is inside the signature; raising it must break verification",
+      "document": {
+        "schema_version": 3,
+        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
+        "revision": 7,
+        "subject": {
+          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
+          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
+          "org_id": "10000000-0000-4000-8000-000000000001"
+        },
+        "issued_at": "2026-09-08T12:00:00Z",
+        "offline_window_sec": 604800,
+        "registered": {
+          "limits": {
+            "max_cameras": 40,
+            "config_editable": false
+          },
+          "features": {
+            "multi_stream": false,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3
+        },
+        "full": {
+          "limits": {
+            "max_cameras": 8,
+            "config_editable": true
+          },
+          "features": {
+            "multi_stream": true,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3,
+          "valid_from": "2026-09-08T12:00:00Z",
+          "valid_until": "2026-10-08T12:00:00Z"
+        },
+        "key_id": "fixture-0",
+        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
+      }
+    },
+    {
+      "name": "tampered_key_id",
+      "why": "key_id is signed, so a document cannot be re-attributed to another key",
+      "document": {
+        "schema_version": 3,
+        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
+        "revision": 7,
+        "subject": {
+          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
+          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
+          "org_id": "10000000-0000-4000-8000-000000000001"
+        },
+        "issued_at": "2026-09-08T12:00:00Z",
+        "offline_window_sec": 604800,
+        "registered": {
+          "limits": {
+            "max_cameras": 4,
+            "config_editable": false
+          },
+          "features": {
+            "multi_stream": false,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3
+        },
+        "full": {
+          "limits": {
+            "max_cameras": 8,
+            "config_editable": true
+          },
+          "features": {
+            "multi_stream": true,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3,
+          "valid_from": "2026-09-08T12:00:00Z",
+          "valid_until": "2026-10-08T12:00:00Z"
+        },
+        "key_id": "other",
+        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
+      }
+    },
+    {
+      "name": "tampered_schema_version",
+      "why": "schema_version is signed, so a document cannot be re-read as another schema",
+      "document": {
+        "schema_version": 4,
+        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
+        "revision": 7,
+        "subject": {
+          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
+          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
+          "org_id": "10000000-0000-4000-8000-000000000001"
+        },
+        "issued_at": "2026-09-08T12:00:00Z",
+        "offline_window_sec": 604800,
+        "registered": {
+          "limits": {
+            "max_cameras": 4,
+            "config_editable": false
+          },
+          "features": {
+            "multi_stream": false,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3
+        },
+        "full": {
+          "limits": {
+            "max_cameras": 8,
+            "config_editable": true
+          },
+          "features": {
+            "multi_stream": true,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3,
+          "valid_from": "2026-09-08T12:00:00Z",
+          "valid_until": "2026-10-08T12:00:00Z"
+        },
+        "key_id": "fixture-0",
+        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
+      }
+    },
+    {
+      "name": "duplicate_key",
+      "why": "decoders disagree about which value wins, so the document has no single meaning",
+      "document": {
+        "schema_version": 3,
+        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
+        "revision": 7,
+        "revision": 9,
+        "subject": {
+          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
+          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
+          "org_id": "10000000-0000-4000-8000-000000000001"
+        },
+        "issued_at": "2026-09-08T12:00:00Z",
+        "offline_window_sec": 604800,
+        "registered": {
+          "limits": {
+            "max_cameras": 4,
+            "config_editable": false
+          },
+          "features": {
+            "multi_stream": false,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3
+        },
+        "full": {
+          "limits": {
+            "max_cameras": 8,
+            "config_editable": true
+          },
+          "features": {
+            "multi_stream": true,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3,
+          "valid_from": "2026-09-08T12:00:00Z",
+          "valid_until": "2026-10-08T12:00:00Z"
+        },
+        "key_id": "fixture-0",
+        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
+      }
+    },
+    {
+      "name": "missing_signature",
+      "why": "an unsigned document grants nothing, including the free set it carries",
+      "document": {
+        "schema_version": 3,
+        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
+        "revision": 7,
+        "subject": {
+          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
+          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
+          "org_id": "10000000-0000-4000-8000-000000000001"
+        },
+        "issued_at": "2026-09-08T12:00:00Z",
+        "offline_window_sec": 604800,
+        "registered": {
+          "limits": {
+            "max_cameras": 4,
+            "config_editable": false
+          },
+          "features": {
+            "multi_stream": false,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3
+        },
+        "full": {
+          "limits": {
+            "max_cameras": 8,
+            "config_editable": true
+          },
+          "features": {
+            "multi_stream": true,
+            "studio_node_transport": false,
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "remote_control": false,
+            "telemetry_upload": true,
+            "operational_profile": false
+          },
+          "conditions_revision": 3,
+          "valid_from": "2026-09-08T12:00:00Z",
+          "valid_until": "2026-10-08T12:00:00Z"
+        },
+        "key_id": "fixture-0",
+        "signature": ""
+      }
+    },
+    {
+      "name": "no_registered_set",
+      "why": "without a usable free set the step down after expiry has nowhere to land",
+      "document": {
+        "full": {
+          "conditions_revision": 3,
+          "features": {
+            "edge_local_config_ui": false,
+            "mrps_console_sync": true,
+            "multi_stream": true,
+            "operational_profile": false,
+            "remote_control": false,
+            "studio_node_transport": false,
+            "telemetry_upload": true
+          },
+          "limits": {
+            "config_editable": true,
+            "max_cameras": 8
+          },
+          "valid_from": "2026-09-08T12:00:00Z",
+          "valid_until": "2026-10-08T12:00:00Z"
+        },
+        "issued_at": "2026-09-08T12:00:00Z",
+        "key_id": "fixture-0",
+        "offline_window_sec": 604800,
+        "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
+        "revision": 7,
+        "schema_version": 3,
+        "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==",
+        "subject": {
+          "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
+          "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
+          "org_id": "10000000-0000-4000-8000-000000000001"
+        }
+      }
+    }
+  ]
+}
