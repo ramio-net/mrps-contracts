@@ -99,6 +99,9 @@ func canonicalWithout(raw []byte, omit string) ([]byte, error) {
 	if err := rejectDuplicateKeys(raw); err != nil {
 		return nil, err
 	}
+	if err := rejectLoneSurrogates(raw); err != nil {
+		return nil, err
+	}
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.UseNumber()
 	var v any
@@ -125,9 +128,97 @@ func canonicalWithout(raw []byte, omit string) ([]byte, error) {
 	return out.Bytes(), nil
 }
 
+// decodeWholeDocument decodes exactly one JSON value and requires the input to end
+// there, so "trailing content" is the reason both sides report for the same bytes.
+func decodeWholeDocument(raw []byte, into any) error {
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	if err := dec.Decode(into); err != nil {
+		return fmt.Errorf("parse capability document: %w", err)
+	}
+	if _, err := dec.Token(); err != io.EOF {
+		return fmt.Errorf("trailing content after capability document")
+	}
+	return nil
+}
+
 // SigningInputV3 is what Ed25519 actually signs.
 func SigningInputV3(canonical []byte) []byte {
 	return signingInput(signingDomainV3, canonical)
+}
+
+// rejectLoneSurrogates scans the RECEIVED bytes, before any decoder sees them.
+//
+// It has to happen there because the damage is done by decoding: Go's json package
+// replaces an unpaired surrogate escape with U+FFFD, so by the time we hold a Go
+// string the original content is already gone and the canonical bytes no longer
+// represent what arrived. JavaScript keeps the half intact. A signature check that
+// quietly rewrites its own input is not a signature check.
+func rejectLoneSurrogates(raw []byte) error {
+	inString := false
+	for i := 0; i < len(raw); i++ {
+		c := raw[i]
+		if !inString {
+			if c == '"' {
+				inString = true
+			}
+			continue
+		}
+		switch {
+		case c == '"':
+			inString = false
+		case c == '\\':
+			if i+1 >= len(raw) {
+				return fmt.Errorf("truncated escape in a signed document")
+			}
+			if raw[i+1] != 'u' {
+				i++ // an escaped character, whatever it is, is not a \u escape
+				continue
+			}
+			hi, err := readHex4(raw, i+2)
+			if err != nil {
+				return err
+			}
+			i += 5
+			if hi >= 0xdc00 && hi <= 0xdfff {
+				return fmt.Errorf("unpaired low surrogate escape in a signed document")
+			}
+			if hi < 0xd800 || hi > 0xdbff {
+				continue
+			}
+			if i+6 >= len(raw) || raw[i+1] != '\\' || raw[i+2] != 'u' {
+				return fmt.Errorf("unpaired high surrogate escape in a signed document")
+			}
+			lo, err := readHex4(raw, i+3)
+			if err != nil {
+				return err
+			}
+			if lo < 0xdc00 || lo > 0xdfff {
+				return fmt.Errorf("high surrogate escape is not followed by a low one")
+			}
+			i += 6
+		}
+	}
+	return nil
+}
+
+func readHex4(raw []byte, at int) (int, error) {
+	if at+4 > len(raw) {
+		return 0, fmt.Errorf("truncated unicode escape in a signed document")
+	}
+	v := 0
+	for _, c := range raw[at : at+4] {
+		switch {
+		case c >= '0' && c <= '9':
+			v = v<<4 | int(c-'0')
+		case c >= 'a' && c <= 'f':
+			v = v<<4 | int(c-'a'+10)
+		case c >= 'A' && c <= 'F':
+			v = v<<4 | int(c-'A'+10)
+		default:
+			return 0, fmt.Errorf("malformed unicode escape in a signed document")
+		}
+	}
+	return v, nil
 }
 
 // rejectDuplicateKeys walks the token stream, because encoding/json silently keeps

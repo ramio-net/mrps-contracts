@@ -45,10 +45,19 @@ func SignV3(p *ProfileV3, keyID string, priv ed25519.PrivateKey) ([]byte, error)
 // it stops being used. Removing a retired key is a separate, deliberate act — keep
 // it verify-only, or documents already issued under it stop being readable, which
 // would put a hidden expiry on a free set that is supposed to have none.
-func VerifyV3(raw []byte, keys KeySet) (ProfileV3, error) {
+//
+// The set is TrustedKeys rather than a bare map of public keys so that what the
+// manifest permits each key to sign arrives here attached to the key. There is no
+// second call to forget.
+func VerifyV3(raw []byte, keys TrustedKeys) (ProfileV3, error) {
 	var p ProfileV3
-	if err := json.Unmarshal(raw, &p); err != nil {
-		return ProfileV3{}, fmt.Errorf("parse capability document: %w", err)
+	// Decoded with the same whole-document rule the canonicaliser applies, so that a
+	// document with something after it is refused HERE and for a reason both
+	// implementations can print. Left to encoding/json it is still refused, but with
+	// a Go-specific message no other language would produce, and a published vector
+	// whose expected reason is one library's wording is not a contract.
+	if err := decodeWholeDocument(raw, &p); err != nil {
+		return ProfileV3{}, err
 	}
 	if p.SchemaVersion != SchemaVersion3 {
 		// Named, so the diagnosis is "this build cannot read that schema" and not
@@ -62,9 +71,15 @@ func VerifyV3(raw []byte, keys KeySet) (ProfileV3, error) {
 	if p.KeyID == "" {
 		return ProfileV3{}, fmt.Errorf("missing key_id")
 	}
-	pub, ok := keys[p.KeyID]
+	key, ok := keys[p.KeyID]
 	if !ok {
 		return ProfileV3{}, fmt.Errorf("unknown key_id %q", p.KeyID)
+	}
+	// What the key was permitted to sign, before asking whether it did sign this.
+	// Checked against the document's own signed issued_at, so the answer does not
+	// depend on the reader's clock and does not change as time passes.
+	if err := key.mayIssue(p.SchemaVersion, p.IssuedAt); err != nil {
+		return ProfileV3{}, fmt.Errorf("key %q: %w", p.KeyID, err)
 	}
 	sig, err := base64.StdEncoding.DecodeString(p.Signature)
 	if err != nil {
@@ -74,7 +89,7 @@ func VerifyV3(raw []byte, keys KeySet) (ProfileV3, error) {
 	if err != nil {
 		return ProfileV3{}, err
 	}
-	if !ed25519.Verify(pub, SigningInputV3(canonical), sig) {
+	if !ed25519.Verify(key.PublicKey, SigningInputV3(canonical), sig) {
 		return ProfileV3{}, fmt.Errorf("invalid signature")
 	}
 	// A document whose free set is missing cannot be accepted at all: the step down
@@ -90,7 +105,7 @@ func VerifyV3(raw []byte, keys KeySet) (ProfileV3, error) {
 }
 
 // VerifyV3ForSubject adds the check that the document was issued to THIS venue.
-func VerifyV3ForSubject(raw []byte, keys KeySet, expected SubjectV3) (ProfileV3, error) {
+func VerifyV3ForSubject(raw []byte, keys TrustedKeys, expected SubjectV3) (ProfileV3, error) {
 	p, err := VerifyV3(raw, keys)
 	if err != nil {
 		return ProfileV3{}, err

@@ -1,103 +1,247 @@
 {
-  "_note": "TEST VECTORS. The key below is derived from a constant in this repository and must never be trusted by a production verifier.",
+  "_note": "TEST VECTORS. The keys below are derived from constants in this repository and must never be trusted by a production verifier.",
+  "_implementers_note": [
+    "The vector NAME is the portable reason code; expected_error is what the Go reference prints and will read differently in another language.",
+    "Duplicate object keys: JSON.parse keeps the last value silently. A verifier must scan the raw bytes for repeated keys itself, or a document that means two things will be accepted as though it meant one.",
+    "Fractions and exponents: after JSON.parse, 7e2 and 700 are the same value and 1.0 and 1 are the same value. A verifier must reject them from the RAW text, before parsing, or it cannot tell it was handed a form this contract does not allow.",
+    "Unpaired surrogate escapes: JavaScript keeps them, Go replaces them with U+FFFD. Reject them from the raw text so neither side canonicalises something other than what arrived.",
+    "Whole numbers stay within ±(2^53−1) precisely so JSON.parse remains exact; nothing else is needed for numbers.",
+    "None of these gaps can cause a WRONG ACCEPT across implementations — a document one side refuses is one the other refuses too, if for a different stated reason. They are listed so a reviewer does not read silence as agreement."
+  ],
   "key": {
     "key_id": "fixture-0",
     "private_seed_utf8": "mrps-capability-schema-3-fixture-key-v1",
     "public_key_base64": "txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE="
   },
   "valid": {
-    "document": {
-      "schema_version": 3,
-      "profile_id": "9f1e2d3c-0000-4000-8000-000000000001",
-      "revision": 7,
-      "subject": {
-        "installation_id": "6d79cb18-0da4-4f11-9e6b-f6defe8e211e",
-        "edge_id": "152b9f17-5410-4178-a4d3-d00a62c39559",
-        "org_id": "10000000-0000-4000-8000-000000000001"
-      },
-      "issued_at": "2026-09-08T12:00:00Z",
-      "offline_window_sec": 604800,
-      "registered": {
-        "limits": {
-          "max_cameras": 4,
-          "config_editable": false
-        },
-        "features": {
-          "multi_stream": false,
-          "studio_node_transport": false,
-          "edge_local_config_ui": false,
-          "mrps_console_sync": true,
-          "remote_control": false,
-          "telemetry_upload": true,
-          "operational_profile": false
-        },
-        "conditions_revision": 3
-      },
-      "full": {
-        "limits": {
-          "max_cameras": 8,
-          "config_editable": true
-        },
-        "features": {
-          "multi_stream": true,
-          "studio_node_transport": false,
-          "edge_local_config_ui": false,
-          "mrps_console_sync": true,
-          "remote_control": false,
-          "telemetry_upload": true,
-          "operational_profile": false
-        },
-        "conditions_revision": 3,
-        "valid_from": "2026-09-08T12:00:00Z",
-        "valid_until": "2026-10-08T12:00:00Z"
-      },
-      "key_id": "fixture-0",
-      "signature": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
-    },
+    "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}",
     "canonical_json": "{\"full\":{\"conditions_revision\":3,\"features\":{\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"multi_stream\":true,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":true,\"max_cameras\":8},\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":604800,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"registered\":{\"conditions_revision\":3,\"features\":{\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":7,\"schema_version\":3,\"subject\":{\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"}}",
     "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b2266756c6c223a7b22636f6e646974696f6e735f7265766973696f6e223a332c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a66616c73652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a747275652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a747275652c226d61785f63616d65726173223a387d2c2276616c69645f66726f6d223a22323032362d30392d30385431323a30303a30305a222c2276616c69645f756e74696c223a22323032362d31302d30385431323a30303a30305a227d2c226973737565645f6174223a22323032362d30392d30385431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226f66666c696e655f77696e646f775f736563223a3630343830302c2270726f66696c655f6964223a2239663165326433632d303030302d343030302d383030302d303030303030303030303031222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a332c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a66616c73652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a372c22736368656d615f76657273696f6e223a332c227375626a656374223a7b22656467655f6964223a2231353262396631372d353431302d343137382d613464332d643030613632633339353539222c22696e7374616c6c6174696f6e5f6964223a2236643739636231382d306461342d346631312d396536622d663664656665386532313165222c226f72675f6964223a2231303030303030302d303030302d343030302d383030302d303030303030303030303031227d7d",
     "signature_base64": "bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg=="
   },
+  "codec": [
+    {
+      "name": "registered_only",
+      "why": "no paid set at all: the free tier is the ordinary case, not a degraded one",
+      "document": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"ut01U9+hmP9ZqNP2axxW3g7RclLz/tuefFme7Gma0O9z0wcttxMhDsoZsiw9YI5Prw+B1uV6GKTKgdnqhX28Ag==\",\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "canonical_json": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b226973737565645f6174223a22323032362d30392d30395431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226f66666c696e655f77696e646f775f736563223a3235393230302c2270726f66696c655f6964223a22702d31222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a312c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a747275652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a312c22736368656d615f76657273696f6e223a332c227375626a656374223a7b22656467655f6964223a22652d31222c22696e7374616c6c6174696f6e5f6964223a22692d31222c226f72675f6964223a226f2d31227d7d",
+      "signature_base64": "ut01U9+hmP9ZqNP2axxW3g7RclLz/tuefFme7Gma0O9z0wcttxMhDsoZsiw9YI5Prw+B1uV6GKTKgdnqhX28Ag=="
+    },
+    {
+      "name": "unknown_signed_field",
+      "why": "a field this build does not know stays inside the signature; rebuilding the document from a struct would drop it and break verification exactly at the venues furthest behind",
+      "document": "{\"future_field\":{\"nested\":[1,2,3]},\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"nyUueJCOpV8yJXXO3DI6Y2XXLy5re5WmVBDmwRMbH6W4Cxp1qzDbX9OZ1CnEQ+GeUKx/PS4lhoxbGhWNVYpZAA==\",\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "canonical_json": "{\"future_field\":{\"nested\":[1,2,3]},\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b226675747572655f6669656c64223a7b226e6573746564223a5b312c322c335d7d2c226973737565645f6174223a22323032362d30392d30395431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226f66666c696e655f77696e646f775f736563223a3235393230302c2270726f66696c655f6964223a22702d31222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a312c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a747275652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a312c22736368656d615f76657273696f6e223a332c227375626a656374223a7b22656467655f6964223a22652d31222c22696e7374616c6c6174696f6e5f6964223a22692d31222c226f72675f6964223a226f2d31227d7d",
+      "signature_base64": "nyUueJCOpV8yJXXO3DI6Y2XXLy5re5WmVBDmwRMbH6W4Cxp1qzDbX9OZ1CnEQ+GeUKx/PS4lhoxbGhWNVYpZAA=="
+    },
+    {
+      "name": "explicit_null_and_false",
+      "why": "an absent value, an explicit null and a false are three different things and must not collapse into one another",
+      "document": "{\"another_thing\":false,\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"optional_thing\":null,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"TDFDURU+OQs29UtFPAtOwbCBAxbCO6gD2bhgCl4CAXxXds4KTRPJV9oJsR6YzQSdygNn1ZKXULNVAIqx46mXBg==\",\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "canonical_json": "{\"another_thing\":false,\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"optional_thing\":null,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b22616e6f746865725f7468696e67223a66616c73652c226973737565645f6174223a22323032362d30392d30395431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226f66666c696e655f77696e646f775f736563223a3235393230302c226f7074696f6e616c5f7468696e67223a6e756c6c2c2270726f66696c655f6964223a22702d31222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a312c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a747275652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a312c22736368656d615f76657273696f6e223a332c227375626a656374223a7b22656467655f6964223a22652d31222c22696e7374616c6c6174696f6e5f6964223a22692d31222c226f72675f6964223a226f2d31227d7d",
+      "signature_base64": "TDFDURU+OQs29UtFPAtOwbCBAxbCO6gD2bhgCl4CAXxXds4KTRPJV9oJsR6YzQSdygNn1ZKXULNVAIqx46mXBg=="
+    },
+    {
+      "name": "html_sensitive_characters",
+      "why": "Go's encoding/json escapes \u003c \u003e and \u0026 while JavaScript does not; a venue whose name contains an ampersand must not fail verification",
+      "document": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"note\":\"Ramio \\u003cSport\\u003e \\u0026 Co\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"qMagKb2efoajfU/+eMbDP3h9xkcPe08Mtd7Gaa/6mwRikb8S0w688gCmHll/q/BVVTFrrWLEZHodHUSgS5fkAg==\",\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "canonical_json": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"note\":\"Ramio \u003cSport\u003e \u0026 Co\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b226973737565645f6174223a22323032362d30392d30395431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226e6f7465223a2252616d696f203c53706f72743e202620436f222c226f66666c696e655f77696e646f775f736563223a3235393230302c2270726f66696c655f6964223a22702d31222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a312c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a747275652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a312c22736368656d615f76657273696f6e223a332c227375626a656374223a7b22656467655f6964223a22652d31222c22696e7374616c6c6174696f6e5f6964223a22692d31222c226f72675f6964223a226f2d31227d7d",
+      "signature_base64": "qMagKb2efoajfU/+eMbDP3h9xkcPe08Mtd7Gaa/6mwRikb8S0w688gCmHll/q/BVVTFrrWLEZHodHUSgS5fkAg=="
+    },
+    {
+      "name": "unicode_text",
+      "why": "Cyrillic, an emoji, U+2028 and a non-BMP character, all emitted literally",
+      "document": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"note\":\"Кириллица ✂ \\u2028 𝄞\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"AhWsJoW1AwEHRBw1BS78OwL6GL5S4K1HW0W4Q3b2MTo1F/GfPbMKh2c9xvZuCKMFeMk0Hk7lwH+BspHraPgIDQ==\",\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "canonical_json": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"note\":\"Кириллица ✂ \u2028 𝄞\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b226973737565645f6174223a22323032362d30392d30395431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226e6f7465223a22d09ad0b8d180d0b8d0bbd0bbd0b8d186d0b020e29c8220e280a820f09d849e222c226f66666c696e655f77696e646f775f736563223a3235393230302c2270726f66696c655f6964223a22702d31222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a312c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a747275652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a312c22736368656d615f76657273696f6e223a332c227375626a656374223a7b22656467655f6964223a22652d31222c22696e7374616c6c6174696f6e5f6964223a22692d31222c226f72675f6964223a226f2d31227d7d",
+      "signature_base64": "AhWsJoW1AwEHRBw1BS78OwL6GL5S4K1HW0W4Q3b2MTo1F/GfPbMKh2c9xvZuCKMFeMk0Hk7lwH+BspHraPgIDQ=="
+    },
+    {
+      "name": "control_characters",
+      "why": "below 0x20 the short escapes are used where JSON defines them and a lowercase \\u00xx otherwise",
+      "document": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"note\":\"a\\tb\\nc\\u0001d\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"3a/JbJt6kfBWvGbBUo/QOVgk36FaLdq60UU6h8W4BoDhLaMQRWMZ8y07Uh4dI7phWYQaTYdkJ9KePJeAnd2vDA==\",\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "canonical_json": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"note\":\"a\\tb\\nc\\u0001d\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b226973737565645f6174223a22323032362d30392d30395431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226e6f7465223a22615c74625c6e635c753030303164222c226f66666c696e655f77696e646f775f736563223a3235393230302c2270726f66696c655f6964223a22702d31222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a312c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a747275652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a312c22736368656d615f76657273696f6e223a332c227375626a656374223a7b22656467655f6964223a22652d31222c22696e7374616c6c6174696f6e5f6964223a22692d31222c226f72675f6964223a226f2d31227d7d",
+      "signature_base64": "3a/JbJt6kfBWvGbBUo/QOVgk36FaLdq60UU6h8W4BoDhLaMQRWMZ8y07Uh4dI7phWYQaTYdkJ9KePJeAnd2vDA=="
+    },
+    {
+      "name": "safe_integer_bounds",
+      "why": "the largest and smallest whole numbers a signed document may carry: JavaScript's exact-integer range, beyond which JSON.parse rounds in silence",
+      "document": "{\"big\":9007199254740991,\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"J44eJfbx61knQZsxRRu2nv1Rg7ufKSODiFbRNzA1BYyVQz0QFKpgyUJcm0YpnuhxVuVO7iKhHfg+hU2kcK7zAw==\",\"small\":-9007199254740991,\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "canonical_json": "{\"big\":9007199254740991,\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"small\":-9007199254740991,\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}",
+      "signing_input_hex": "6d7270732d6361706162696c6974792d736368656d612d33007b22626967223a393030373139393235343734303939312c226973737565645f6174223a22323032362d30392d30395431323a30303a30305a222c226b65795f6964223a22666978747572652d30222c226f66666c696e655f77696e646f775f736563223a3235393230302c2270726f66696c655f6964223a22702d31222c2272656769737465726564223a7b22636f6e646974696f6e735f7265766973696f6e223a312c226665617475726573223a7b22656467655f6c6f63616c5f636f6e6669675f7569223a747275652c226d7270735f636f6e736f6c655f73796e63223a747275652c226d756c74695f73747265616d223a66616c73652c226f7065726174696f6e616c5f70726f66696c65223a66616c73652c2272656d6f74655f636f6e74726f6c223a66616c73652c2273747564696f5f6e6f64655f7472616e73706f7274223a66616c73652c2274656c656d657472795f75706c6f6164223a747275657d2c226c696d697473223a7b22636f6e6669675f6564697461626c65223a66616c73652c226d61785f63616d65726173223a347d7d2c227265766973696f6e223a312c22736368656d615f76657273696f6e223a332c22736d616c6c223a2d393030373139393235343734303939312c227375626a656374223a7b22656467655f6964223a22652d31222c22696e7374616c6c6174696f6e5f6964223a22692d31222c226f72675f6964223a226f2d31227d7d",
+      "signature_base64": "J44eJfbx61knQZsxRRu2nv1Rg7ufKSODiFbRNzA1BYyVQz0QFKpgyUJcm0YpnuhxVuVO7iKhHfg+hU2kcK7zAw=="
+    }
+  ],
   "negative": [
     {
       "name": "tampered_free_cameras",
       "why": "the free set is inside the signature; raising it must break verification",
+      "stage": "verify_document",
+      "expected_error": "invalid signature",
       "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":40,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
     },
     {
       "name": "tampered_key_id",
       "why": "key_id is signed, so a document cannot be re-attributed to another key",
+      "stage": "verify_document",
+      "expected_error": "unknown key_id",
       "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"other\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
     },
     {
       "name": "tampered_schema_version",
       "why": "schema_version is signed, so a document cannot be re-read as another schema",
+      "stage": "verify_document",
+      "expected_error": "unsupported schema_version",
       "document": "{\"schema_version\":4,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
     },
     {
       "name": "duplicate_key",
       "why": "decoders disagree about which value wins, so the document has no single meaning",
+      "stage": "verify_document",
+      "expected_error": "duplicate key",
       "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"revision\":9,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
     },
     {
       "name": "missing_signature",
       "why": "an unsigned document grants nothing, including the free set it carries",
+      "stage": "verify_document",
+      "expected_error": "missing signature",
       "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"\"}"
     },
     {
       "name": "no_usable_registered_set",
       "why": "signature is VALID; the refusal must come from the free set being unusable, because without it the step down after expiry has nowhere to land",
+      "stage": "verify_document",
+      "expected_error": "registered set is missing or unusable",
       "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":0,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"G3qj3cqDc/u05DsZUKjBNIRbB5AScd0WOuDrLyB3csQE/hxOOPmwsxZd2r2Bx1HkxJy1T6F6gS5KxGDeUHHKCQ==\"}"
     },
     {
       "name": "registered_removed_after_signing",
       "why": "the free set is inside the signature, so removing it must break verification",
+      "stage": "verify_document",
+      "expected_error": "invalid signature",
       "document": "{\"full\":{\"conditions_revision\":3,\"features\":{\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"multi_stream\":true,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":true,\"max_cameras\":8},\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":604800,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"schema_version\":3,\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\",\"subject\":{\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"}}"
     },
     {
       "name": "trailing_content",
       "why": "anything after the document is refused; a stray closing brace is not another value and must not be read as one",
+      "stage": "verify_document",
+      "expected_error": "trailing content",
       "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}}"
+    },
+    {
+      "name": "fractional_number",
+      "why": "float spelling differs between languages (Go writes 1e+06 where JavaScript writes 1000000), so a signed document carries whole numbers only",
+      "stage": "verify_document",
+      "expected_error": "whole numbers only",
+      "document": "{\"schema_version\":3,\"profile_id\":\"p-1\",\"revision\":1,\"subject\":{\"installation_id\":\"i-1\",\"edge_id\":\"e-1\",\"org_id\":\"o-1\"},\"issued_at\":\"2026-09-09T12:00:00Z\",\"offline_window_sec\":259200,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":1},\"ratio\":1.5,\"key_id\":\"fixture-0\",\"signature\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\"}"
+    },
+    {
+      "name": "exponent_number",
+      "why": "same reason: an exponent has more than one spelling",
+      "stage": "verify_document",
+      "expected_error": "whole numbers only",
+      "document": "{\"schema_version\":3,\"profile_id\":\"p-1\",\"revision\":1,\"subject\":{\"installation_id\":\"i-1\",\"edge_id\":\"e-1\",\"org_id\":\"o-1\"},\"issued_at\":\"2026-09-09T12:00:00Z\",\"offline_window_sec\":259200,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":1},\"ratio\":7e2,\"key_id\":\"fixture-0\",\"signature\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\"}"
+    },
+    {
+      "name": "non_ascii_object_key",
+      "why": "Go orders keys by byte and RFC 8785 by UTF-16 code unit; the two can disagree above the BMP, so keys are ASCII",
+      "stage": "verify_document",
+      "expected_error": "is not ASCII",
+      "document": "{\"schema_version\":3,\"profile_id\":\"p-1\",\"revision\":1,\"subject\":{\"installation_id\":\"i-1\",\"edge_id\":\"e-1\",\"org_id\":\"o-1\"},\"issued_at\":\"2026-09-09T12:00:00Z\",\"offline_window_sec\":259200,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":1},\"ключ\":1,\"key_id\":\"fixture-0\",\"signature\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\"}"
+    },
+    {
+      "name": "lone_surrogate_escape",
+      "why": "Go replaces an unpaired surrogate with U+FFFD while JavaScript keeps it; a signature check must not quietly rewrite its own input",
+      "stage": "verify_document",
+      "expected_error": "surrogate",
+      "document": "{\"schema_version\":3,\"profile_id\":\"p-1\",\"revision\":1,\"subject\":{\"installation_id\":\"i-1\",\"edge_id\":\"e-1\",\"org_id\":\"o-1\"},\"issued_at\":\"2026-09-09T12:00:00Z\",\"offline_window_sec\":259200,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":1},\"note\":\"\\ud800\",\"key_id\":\"fixture-0\",\"signature\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\"}"
+    },
+    {
+      "name": "integer_beyond_safe_range",
+      "why": "JavaScript's JSON.parse turns 9223372036854775807 into 9223372036854776000 without saying so; the document would then canonicalise differently on the two sides and the venue would be told its signature was invalid",
+      "stage": "verify_document",
+      "expected_error": "outside the range",
+      "document": "{\"schema_version\":3,\"profile_id\":\"p-1\",\"revision\":1,\"subject\":{\"installation_id\":\"i-1\",\"edge_id\":\"e-1\",\"org_id\":\"o-1\"},\"issued_at\":\"2026-09-09T12:00:00Z\",\"offline_window_sec\":259200,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":1},\"big\":9223372036854775807,\"key_id\":\"fixture-0\",\"signature\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\"}"
     }
-  ]
+  ],
+  "manifest": {
+    "root_key": {
+      "key_id": "fixture-root-0",
+      "private_seed_utf8": "mrps-signing-key-manifest-fixture-root-v1",
+      "public_key_base64": "UV6z+JvZ1UJZA6z3q65uSCXOXw5ftO2VRcOAtmFUI3o="
+    },
+    "environment": "production",
+    "valid": {
+      "document": "{\"format_version\":1,\"issuer\":\"ramio\",\"environment\":\"production\",\"revision\":5,\"issued_at\":\"2026-09-09T12:00:00Z\",\"keys\":[{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":[3]}],\"root_key_id\":\"fixture-root-0\",\"signature\":\"eUqyqlaU+QY4fPMNirxrBuTNv5CJUlNenYOwlFVPxrk/CzVpSKAqMcdWq9p7aXhfocriJ04HS64ohavB9TF9Bw==\"}",
+      "canonical_json": "{\"environment\":\"production\",\"format_version\":1,\"issued_at\":\"2026-09-09T12:00:00Z\",\"issuer\":\"ramio\",\"keys\":[{\"allowed_schema_versions\":[3],\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\"}],\"revision\":5,\"root_key_id\":\"fixture-root-0\"}",
+      "signing_input_hex": "6d7270732d7369676e696e672d6b65792d6d616e69666573742d31007b22656e7669726f6e6d656e74223a2270726f64756374696f6e222c22666f726d61745f76657273696f6e223a312c226973737565645f6174223a22323032362d30392d30395431323a30303a30305a222c22697373756572223a2272616d696f222c226b657973223a5b7b22616c6c6f7765645f736368656d615f76657273696f6e73223a5b335d2c226b65795f6964223a22666978747572652d30222c227075626c69635f6b6579223a22747870716e6150302f6c42655359765573376c4b56757250344973775470704e77306f624d45746b676c453d227d5d2c227265766973696f6e223a352c22726f6f745f6b65795f6964223a22666978747572652d726f6f742d30227d",
+      "signature_base64": "eUqyqlaU+QY4fPMNirxrBuTNv5CJUlNenYOwlFVPxrk/CzVpSKAqMcdWq9p7aXhfocriJ04HS64ohavB9TF9Bw=="
+    },
+    "negative": [
+      {
+        "name": "signed_by_the_online_signer",
+        "why": "whoever takes the running service must not be able to install a key of their choosing; only the offline root signs the list",
+        "stage": "verify_manifest",
+        "expected_error": "invalid manifest signature",
+        "manifest": "{\"format_version\":1,\"issuer\":\"ramio\",\"environment\":\"production\",\"revision\":5,\"issued_at\":\"2026-09-09T12:00:00Z\",\"keys\":[{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":[3]}],\"root_key_id\":\"fixture-root-0\",\"signature\":\"+7z8c6GTzJd1rlSyJ4ct1Yw9UfcAW3mLUTmMfbzhMDTFFOCoZ3/T3Xtqj8YRiHLVPZ3GmhIaCZ570w8nr4h/Aw==\"}",
+        "have_revision": 0
+      },
+      {
+        "name": "duplicate_key_id",
+        "why": "one key_id present twice, once current and once revoked: whether it survives would depend on which entry the reader applied last",
+        "stage": "verify_manifest",
+        "expected_error": "more than once",
+        "manifest": "{\"format_version\":1,\"issuer\":\"ramio\",\"environment\":\"production\",\"revision\":5,\"issued_at\":\"2026-09-09T12:00:00Z\",\"keys\":[{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":[3]},{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":[3],\"revoked\":true}],\"root_key_id\":\"fixture-root-0\",\"signature\":\"906ORs5RsgNlQ8AsQYaahqdeQiYRJ7HF6XlkPVE0ok2CbSqspHYctNRs3n+f+Bzay97eA01PvzBzAdyObzg4DQ==\"}",
+        "have_revision": 0
+      },
+      {
+        "name": "wrong_environment",
+        "why": "a list built for a test rig must never apply to a venue in the field",
+        "stage": "verify_manifest",
+        "expected_error": "environment",
+        "manifest": "{\"format_version\":1,\"issuer\":\"ramio\",\"environment\":\"staging\",\"revision\":5,\"issued_at\":\"2026-09-09T12:00:00Z\",\"keys\":[{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":[3]}],\"root_key_id\":\"fixture-root-0\",\"signature\":\"BOj4LfG9E+IWnj5rDaOmpofqUx8ZZjvPdUsB+tjbXt9G8SNumoOdNO7MBJ6OVnc8r0oq1M2AWwIT5BqSOtgnDA==\"}",
+        "have_revision": 0
+      },
+      {
+        "name": "revision_does_not_advance",
+        "why": "replaying an older list is how a withdrawn key is reinstated; repeating the CURRENT one is the ordinary case and means keep what you have",
+        "stage": "verify_manifest",
+        "expected_error": "does not advance",
+        "manifest": "{\"format_version\":1,\"issuer\":\"ramio\",\"environment\":\"production\",\"revision\":5,\"issued_at\":\"2026-09-09T12:00:00Z\",\"keys\":[{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":[3]}],\"root_key_id\":\"fixture-root-0\",\"signature\":\"eUqyqlaU+QY4fPMNirxrBuTNv5CJUlNenYOwlFVPxrk/CzVpSKAqMcdWq9p7aXhfocriJ04HS64ohavB9TF9Bw==\"}",
+        "have_revision": 5
+      },
+      {
+        "name": "all_keys_revoked",
+        "why": "a valid list saying everything is withdrawn means STOP trusting what you hold; it must not be confused with a list that could not be read",
+        "stage": "trusted_key_set",
+        "expected_error": "every key in the manifest is revoked",
+        "manifest": "{\"format_version\":1,\"issuer\":\"ramio\",\"environment\":\"production\",\"revision\":5,\"issued_at\":\"2026-09-09T12:00:00Z\",\"keys\":[{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":null,\"revoked\":true}],\"root_key_id\":\"fixture-root-0\",\"signature\":\"/DfGX+J4OMtSzXzpflpmzxccae4p7+9s+wBQmB5tB1mV3h5jhs90YV+XWItL8gCAPHKFR3aV/L7WDT7h/J1fAA==\"}",
+        "have_revision": 0
+      },
+      {
+        "name": "key_not_allowed_for_this_schema",
+        "why": "the list permits this key schema 2 only; a schema 3 document signed by it must be refused even though the signature is genuine",
+        "stage": "verify_document",
+        "expected_error": "not permitted to sign schema 3",
+        "manifest": "{\"format_version\":1,\"issuer\":\"ramio\",\"environment\":\"production\",\"revision\":5,\"issued_at\":\"2026-09-09T12:00:00Z\",\"keys\":[{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":[2]}],\"root_key_id\":\"fixture-root-0\",\"signature\":\"JYmcqEcUNy+QsqAU4/PAWXpVyrj74pFASKQhUFbNeqAcwur8JhtkbfBIHOZFmGc21HDtA9QNzeFijQj/nmUUCw==\"}",
+        "have_revision": 0,
+        "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
+      },
+      {
+        "name": "document_issued_after_signing_window",
+        "why": "the window bounds NEW documents and is measured against the document's own signed issued_at, never the reader's clock",
+        "stage": "verify_document",
+        "expected_error": "stopped being allowed to sign",
+        "manifest": "{\"format_version\":1,\"issuer\":\"ramio\",\"environment\":\"production\",\"revision\":5,\"issued_at\":\"2026-09-09T12:00:00Z\",\"keys\":[{\"key_id\":\"fixture-0\",\"public_key\":\"txpqnaP0/lBeSYvUs7lKVurP4IswTppNw0obMEtkglE=\",\"allowed_schema_versions\":[3],\"signing_until\":\"2026-09-01T00:00:00Z\"}],\"root_key_id\":\"fixture-root-0\",\"signature\":\"oNcsh+kqU3rWv6flu+ZFTmGktVL2lXMiOiOJhXOJU3b+AbQ9V0VCVDZn1TkcVAW6yDThj2fD+fACxObi+MLmDg==\"}",
+        "have_revision": 0,
+        "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
+      }
+    ]
+  }
 }

@@ -10,11 +10,11 @@ import (
 	"time"
 )
 
-func testKey(t *testing.T, name string) (ed25519.PrivateKey, KeySet) {
+func testKey(t *testing.T, name string) (ed25519.PrivateKey, TrustedKeys) {
 	t.Helper()
 	seed := sha256.Sum256([]byte(name))
 	priv := ed25519.NewKeyFromSeed(seed[:])
-	return priv, KeySet{name: priv.Public().(ed25519.PublicKey)}
+	return priv, DevelopmentTrust(name, priv.Public().(ed25519.PublicKey), SchemaVersion3)
 }
 
 func sampleV3() *ProfileV3 {
@@ -159,7 +159,7 @@ func TestSchemaAndKeyAreSigned(t *testing.T) {
 func TestBothKeysVerifyDuringRotation(t *testing.T) {
 	priv0, set0 := testKey(t, "prod-0")
 	priv1, set1 := testKey(t, "prod-1")
-	during := KeySet{}
+	during := TrustedKeys{}
 	for k, v := range set0 {
 		during[k] = v
 	}
