@@ -43,9 +43,33 @@ import (
 //   - Escaped surrogate halves are refused before decoding, because Go silently
 //     replaces a lone surrogate with U+FFFD while JavaScript keeps it — a silent
 //     change of content inside a signature check.
+//
+// NONE of it applies to schema 2. Those rules arrived after schema 2 profiles had
+// already been signed and distributed, and a canonical form is only canonical if it
+// never changes: rewriting it retroactively invalidates every signature already in
+// the field. Cloud found this the day it was introduced — a schema 2 profile with an
+// ampersand in its key_id verified under v0.6.0 and stopped verifying afterwards.
+// Schema 2 therefore keeps the form it was born with, exactly, forever, and the two
+// codecs below are separate on purpose.
 
-// CanonicalBytes returns RFC 8785-style canonical JSON for a profile with the
-// signature cleared. It is deliberately independent from Go struct field order.
+// canonicalCodec selects which canonical form applies. The value is never inferred:
+// each entry point states which one it is, so a shared helper cannot quietly change
+// the meaning of a signature that already exists.
+type canonicalCodec int
+
+const (
+	// codecSchema2 is FROZEN. Whatever it does today is what it must do in ten
+	// years, including the parts a fresh design would not choose: Go's HTML escaping
+	// of < > &, its escaping of U+2028, and its float formatting. Those are not
+	// features, they are the shape of signatures already issued.
+	codecSchema2 canonicalCodec = iota
+	// codecSigned is schema 3 and the key manifest, where the rules above hold.
+	codecSigned
+)
+
+// CanonicalBytes returns canonical JSON for a schema 2 profile with the signature
+// cleared. It is deliberately independent from Go struct field order — and, since
+// 2026-09-10, deliberately independent from the schema 3 codec as well.
 func CanonicalBytes(p Profile) ([]byte, error) {
 	cp := p
 	cp.Signature = ""
@@ -61,13 +85,13 @@ func CanonicalBytes(p Profile) ([]byte, error) {
 		return nil, err
 	}
 	var out bytes.Buffer
-	if err := writeCanonical(&out, v); err != nil {
+	if err := writeCanonical(&out, v, codecSchema2); err != nil {
 		return nil, err
 	}
 	return out.Bytes(), nil
 }
 
-func writeCanonical(out *bytes.Buffer, v any) error {
+func writeCanonical(out *bytes.Buffer, v any, c canonicalCodec) error {
 	switch x := v.(type) {
 	case nil:
 		out.WriteString("null")
@@ -78,11 +102,11 @@ func writeCanonical(out *bytes.Buffer, v any) error {
 			out.WriteString("false")
 		}
 	case string:
-		if err := writeCanonicalString(out, x); err != nil {
+		if err := writeString(out, x, c); err != nil {
 			return err
 		}
 	case json.Number:
-		s, err := canonicalNumber(x.String())
+		s, err := canonicalNumber(x.String(), c)
 		if err != nil {
 			return err
 		}
@@ -93,7 +117,7 @@ func writeCanonical(out *bytes.Buffer, v any) error {
 			if i > 0 {
 				out.WriteByte(',')
 			}
-			if err := writeCanonical(out, item); err != nil {
+			if err := writeCanonical(out, item, c); err != nil {
 				return err
 			}
 		}
@@ -109,14 +133,16 @@ func writeCanonical(out *bytes.Buffer, v any) error {
 			if i > 0 {
 				out.WriteByte(',')
 			}
-			if err := checkASCIIKey(k); err != nil {
-				return err
+			if c == codecSigned {
+				if err := checkASCIIKey(k); err != nil {
+					return err
+				}
 			}
-			if err := writeCanonicalString(out, k); err != nil {
+			if err := writeString(out, k, c); err != nil {
 				return err
 			}
 			out.WriteByte(':')
-			if err := writeCanonical(out, x[k]); err != nil {
+			if err := writeCanonical(out, x[k], c); err != nil {
 				return err
 			}
 		}
@@ -127,7 +153,24 @@ func writeCanonical(out *bytes.Buffer, v any) error {
 	return nil
 }
 
-func canonicalNumber(s string) (string, error) {
+func writeString(out *bytes.Buffer, s string, c canonicalCodec) error {
+	if c == codecSchema2 {
+		// Frozen: Go's own escaping, HTML escapes and all. Changing it here changes
+		// the meaning of signatures issued years ago.
+		b, err := json.Marshal(s)
+		if err != nil {
+			return err
+		}
+		out.Write(b)
+		return nil
+	}
+	return writeCanonicalString(out, s)
+}
+
+func canonicalNumber(s string, c canonicalCodec) (string, error) {
+	if c == codecSchema2 {
+		return legacyNumber(s)
+	}
 	if strings.ContainsAny(s, ".eE") {
 		return "", fmt.Errorf("a signed document carries whole numbers only; %q is not one", s)
 	}
@@ -143,6 +186,28 @@ func canonicalNumber(s string) (string, error) {
 // holds exactly. Beyond it JavaScript rounds silently, which inside a signature check
 // means a wrong answer reported as a bad signature.
 const maxSafeInteger = 1<<53 - 1
+
+// legacyNumber is schema 2's number form, kept exactly as it was. It tolerates
+// floats and the full 64-bit integer range because that is what it did when the
+// signatures now in the field were produced.
+func legacyNumber(s string) (string, error) {
+	if strings.ContainsAny(s, ".eE") {
+		f, err := strconv.ParseFloat(s, 64)
+		if err != nil {
+			return "", err
+		}
+		return strconv.FormatFloat(f, 'g', -1, 64), nil
+	}
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err == nil {
+		return strconv.FormatInt(i, 10), nil
+	}
+	u, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return "", err
+	}
+	return strconv.FormatUint(u, 10), nil
+}
 
 // writeCanonicalString emits the minimum escaping JSON requires and nothing more,
 // which is what every other language's default already produces.
@@ -187,4 +252,21 @@ func checkASCIIKey(k string) error {
 		}
 	}
 	return nil
+}
+
+// legacyCanonicalDoc exposes the frozen schema 2 writer for the cross-version tests,
+// so they assert the two codecs differ rather than assuming it. It decodes the way
+// CanonicalBytes does, numbers included.
+func legacyCanonicalDoc(doc string) ([]byte, error) {
+	dec := json.NewDecoder(bytes.NewReader([]byte(doc)))
+	dec.UseNumber()
+	var v any
+	if err := dec.Decode(&v); err != nil {
+		return nil, err
+	}
+	var out bytes.Buffer
+	if err := writeCanonical(&out, v, codecSchema2); err != nil {
+		return nil, err
+	}
+	return out.Bytes(), nil
 }

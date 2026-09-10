@@ -122,7 +122,7 @@ func canonicalWithout(raw []byte, omit string) ([]byte, error) {
 	delete(obj, omit)
 
 	var out bytes.Buffer
-	if err := writeCanonical(&out, obj); err != nil {
+	if err := writeCanonical(&out, obj, codecSigned); err != nil {
 		return nil, err
 	}
 	return out.Bytes(), nil
