@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/ramio-net/mrps-contracts/capability"
@@ -59,6 +60,25 @@ type SyncRequest struct {
 	// Absent from an Edge too old to report it, which Cloud must render as "taken,
 	// not confirmed" rather than assuming either answer.
 	AppliedConfig *AppliedConfig `json:"applied_config,omitempty"`
+
+	// SupportedSchemaVersions is what this build can READ, declared so Cloud never
+	// issues a document the venue cannot use.
+	//
+	// This is a hard precondition, not a courtesy. A capability document of a newer
+	// schema carries its limits somewhere an older decoder does not look, so issuing
+	// one blindly does not degrade a venue gracefully — measured on this build, it
+	// lands on the emergency floor of two cameras and thirty minutes, and reports the
+	// fault as a bad signature. Absent means schema 2 only: an Edge too old to
+	// declare anything is too old to receive anything new.
+	SupportedSchemaVersions []int `json:"supported_schema_versions,omitempty"`
+
+	// KnownKeyIDs is which signing keys this venue already trusts.
+	//
+	// Rotation follows acknowledgement, never a calendar. Cloud may start signing
+	// with a new key only for nodes that have said they hold it; the rest keep
+	// getting the previous key until they catch up. Switching the fleet because N
+	// days have passed is how a rotation turns into an outage.
+	KnownKeyIDs []string `json:"known_key_ids,omitempty"`
 }
 
 // AppliedConfig names one delivered configuration exactly.
@@ -81,6 +101,31 @@ type AppliedConfig struct {
 
 type SyncResponse struct {
 	CapabilityProfile capability.Profile `json:"capability_profile"`
+	// CapabilityDocument carries a schema 3 document as the EXACT BYTES that were
+	// signed, and it is raw on purpose.
+	//
+	// A typed field cannot do this job. Unmarshalling into a struct and marshalling
+	// again drops every field this build does not know, so the canonical form would
+	// differ from what the issuer signed and verification would fail — on precisely
+	// the venues furthest behind, which are the ones least able to be fixed remotely.
+	// Schema 3 verification reads the received bytes; this is where they arrive.
+	//
+	// Absent when Cloud is answering a node that has not declared schema 3, in which
+	// case CapabilityProfile above carries schema 2 exactly as before.
+	CapabilityDocument json.RawMessage `json:"capability_document,omitempty"`
+	// KeyManifest is the trusted key list, signed by the OFFLINE ROOT and carried as
+	// the exact bytes that were signed.
+	//
+	// Raised by Cloud in review and they were right: a plain list of keys inside an
+	// authenticated sync response is only as trustworthy as the service sending it.
+	// Whoever takes the running service could then install a key of their choosing and
+	// mint any entitlement — the capability signature would verify perfectly, against
+	// a key the attacker put there. The manifest is signed by a root that does not
+	// live in the Cloud runtime at all, so the sync channel carries it without being
+	// able to forge it.
+	//
+	// Absent leaves the venue's current set untouched.
+	KeyManifest json.RawMessage `json:"key_manifest,omitempty"`
 	// Nil means Cloud has no production session assigned to this Edge, and that is
 	// encoded as an explicit null rather than dropped: "no session" is an answer Edge
 	// acts on — it keeps its local config — not a missing value. With omitempty the

@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "profile_id": "00000000-0000-4000-8000-000000000004",
+  "preset": "registered",
+  "source": "registered_platform_template",
+  "subject": {
+    "installation_id": "00000000-0000-4000-8000-000000000001",
+    "edge_id": "00000000-0000-4000-8000-000000000002",
+    "org_id": "00000000-0000-4000-8000-000000000003"
+  },
+  "limits": {
+    "max_cameras": 4,
+    "max_session_duration_minutes": 60,
+    "config_editable": true
+  },
+  "features": {
+    "multi_stream": false,
+    "studio_node_transport": false,
+    "edge_local_config_ui": true,
+    "mrps_console_sync": true,
+    "remote_control": false,
+    "telemetry_upload": true,
+    "operational_profile": true
+  },
+  "issued_at": "2026-09-08T12:00:00Z",
+  "valid_until": "2026-10-08T12:00:00Z",
+  "key_id": "review&key",
+  "signature": "RdSpNycuKINNQQrKrh8Jlo1od+XE15WvpZgTupggPIvj6GfdcIKSs9AKq8FUeAgnUzcE3p6lBQJLO7Eq3XZRCw=="
+}
