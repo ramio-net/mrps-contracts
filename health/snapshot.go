@@ -63,6 +63,9 @@ type DeviceHealthSnapshot struct {
 	// absent, never zero. Zero is a legitimate reading for several of them.
 	Latency *LatencySection `json:"latency,omitempty"`
 	SRT     *SRTSection     `json:"srt,omitempty"`
+	// Counters are the monotonic totals behind the rates above. Absent from an Edge
+	// too old to send them.
+	Counters *CountersSection `json:"counters,omitempty"`
 }
 
 // LatencySection splits the delay a camera actually shows into parts an operator
@@ -170,4 +173,62 @@ func FakeSnapshot(deviceID string, ts time.Time, seq int, cause CauseSection) De
 			MemMB:      512,
 		},
 	}
+}
+
+// CountersSection carries one device's monotonic totals, and it exists because the
+// rates cannot be added up.
+//
+// Everything else in a snapshot is a rolling rate over a ten-second window, sampled
+// once a second, so consecutive samples overlap by nine seconds out of ten. Averaging
+// sixty of them does not give the minute: it weights the middle of the minute nine
+// times more than its edges, and a burst landing on a boundary is counted into both
+// neighbours. That is fine for a needle on a panel and wrong for a record someone
+// reads a month later to decide whether a handset stays in the park.
+//
+// A consumer takes two readings and subtracts, and gets exactly what happened in
+// between — at any interval, and undisturbed by an upload that never arrived. Deltas
+// computed at this end would instead require Edge to know the consumer's interval
+// boundaries, and a lost message would silently remove a slice of history.
+type CountersSection struct {
+	// Since is when these totals started accumulating for this device.
+	//
+	// It is the RESET MARKER, and it is inside the snapshot rather than in the upload
+	// envelope so a stored row can be interpreted on its own. While Since is unchanged
+	// the counters are monotonic and may be subtracted; across a change of Since they
+	// may not, because they restarted from zero.
+	//
+	// Counters deliberately survive a camera reconnecting: a camera that dropped and
+	// came back keeps one continuous account of what it cost. They restart only when
+	// Edge does.
+	Since time.Time `json:"since"`
+
+	// IngestVideoFrames counts frames that actually arrived from the phone, which is
+	// the honest answer to "was this camera delivering" — output frames keep being
+	// produced while a camera is held, and would say yes for a phone that stopped
+	// sending a minute ago.
+	IngestVideoFrames uint64 `json:"ingest_video_frames"`
+	// OutputVideoFrames is the denominator. Without it a held-frame count cannot be
+	// turned back into a rate.
+	OutputVideoFrames uint64 `json:"output_video_frames"`
+	OutputHeldFrames  uint64 `json:"output_held_frames"`
+
+	// The freeze split by cause, measured rather than inferred. They are different
+	// faults with different cures — starved wants a lower bitrate or better RF, resync
+	// wants a keyframe, late wants a deeper buffer, and offair is not a fault at all —
+	// so a single held total cannot be acted on.
+	//
+	// INVARIANT: HeldStarved + HeldResync + HeldLate + HeldOffAir == OutputHeldFrames.
+	// It holds by construction, and a consumer is encouraged to assert it: a mismatch
+	// means a fifth case exists that nothing is counting, which is to say freezes with
+	// no cause attached.
+	HeldStarved uint64 `json:"held_starved"`
+	HeldResync  uint64 `json:"held_resync"`
+	HeldLate    uint64 `json:"held_late"`
+	HeldOffAir  uint64 `json:"held_offair"`
+
+	// The three SRT counters share one interval, so loss and retransmit can be read
+	// against the same denominator instead of against each other's guesses.
+	SRTPktRecv    uint64 `json:"srt_pkt_recv"`
+	SRTPktLoss    uint64 `json:"srt_pkt_loss"`
+	SRTPktRetrans uint64 `json:"srt_pkt_retrans"`
 }
