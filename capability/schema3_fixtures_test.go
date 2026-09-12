@@ -153,24 +153,32 @@ func TestSchema3Fixtures(t *testing.T) {
 	want.Note = "TEST VECTORS. The keys below are derived from constants in this " +
 		"repository and must never be trusted by a production verifier."
 	want.Implementers = []string{
+		"MANDATORY. The three checks below are not diagnostics and not politeness: a " +
+			"verifier that skips them will ACCEPT documents that were never signed. " +
+			"They are listed separately only because an ordinary JSON parser cannot " +
+			"perform them — by the time it returns, the evidence is gone.",
+		"Duplicate object keys: JSON.parse and Go both keep the LAST value, so a forged " +
+			"pair placed BEFORE the signed one leaves the parsed value untouched — the " +
+			"signature verifies, and any consumer whose parser takes the first value " +
+			"instead reads the forged one. Vector duplicate_key_shadowing is a document " +
+			"a verifier without a raw duplicate scan accepts. Scan the raw bytes.",
+		"Fractions and exponents: after parsing, 7e0 and 7 are the same value, so " +
+			"rewriting a signed 7 as 7e0 changes the bytes without changing what the " +
+			"parser sees. The signature then verifies over content the issuer never " +
+			"produced. Vector exponent_preserving_value shows it. Reject them from the " +
+			"RAW text, before parsing.",
+		"Unpaired surrogate escapes: Go silently replaces them with U+FFFD, so a signed " +
+			"U+FFFD can be rewritten as \\ud800 and still verify. Vector " +
+			"surrogate_rewrite shows it. Reject them from the raw text.",
+		"Whole numbers stay within ±(2^53−1) so JSON.parse remains exact. This one IS " +
+			"sufficient on its own: inside that range no two distinct integers round " +
+			"together, which is what removes the same attack for numbers.",
 		"The vector NAME is the portable reason code; expected_error is what the Go " +
 			"reference prints and will read differently in another language.",
-		"Duplicate object keys: JSON.parse keeps the last value silently. A verifier " +
-			"must scan the raw bytes for repeated keys itself, or a document that means " +
-			"two things will be accepted as though it meant one.",
-		"Fractions and exponents: after JSON.parse, 7e2 and 700 are the same value and " +
-			"1.0 and 1 are the same value. A verifier must reject them from the RAW " +
-			"text, before parsing, or it cannot tell it was handed a form this contract " +
-			"does not allow.",
-		"Unpaired surrogate escapes: JavaScript keeps them, Go replaces them with " +
-			"U+FFFD. Reject them from the raw text so neither side canonicalises " +
-			"something other than what arrived.",
-		"Whole numbers stay within ±(2^53−1) precisely so JSON.parse remains exact; " +
-			"nothing else is needed for numbers.",
-		"None of these gaps can cause a WRONG ACCEPT across implementations — a " +
-			"document one side refuses is one the other refuses too, if for a different " +
-			"stated reason. They are listed so a reviewer does not read silence as " +
-			"agreement.",
+		"Put another way: verifying a signature proves the CANONICAL FORM was signed. " +
+			"It says nothing about the bytes that arrived unless the canonical form can " +
+			"be reached from those bytes one way only. These checks are what makes that " +
+			"true.",
 	}
 	want.Key.KeyID = "fixture-0"
 	want.Key.Seed = fixtureSeed
@@ -387,6 +395,51 @@ func negativeVectors(t *testing.T, signed []byte) []negativeVector {
 			"another value and must not be read as one",
 		"trailing content",
 		[]byte(string(signed)+"}"))
+
+	// The three below are the ones that matter most, and the reason the raw-text
+	// checks are mandatory rather than advisory. Cloud raised it before the tag and
+	// they were right: each of these carries a GENUINE signature over the signed
+	// canonical form, while the bytes on the wire say something the issuer never
+	// produced. A verifier that trusts its JSON parser accepts all three.
+	//
+	// TestTheRawChecksAreLoadBearing proves that claim rather than asserting it: it
+	// canonicalises each one the way a lenient implementation would and shows the
+	// signature verifying.
+	add("duplicate_key_shadowing",
+		"the forged pair is placed BEFORE the signed one, so a last-value-wins parser "+
+			"reproduces the signed form exactly and the signature VERIFIES; a consumer "+
+			"whose parser takes the first value reads 9 where the issuer wrote 7. "+
+			"Without a raw duplicate scan this document is accepted",
+		"duplicate key",
+		[]byte(strings.Replace(string(signed), `"revision":7`, `"revision":9,"revision":7`, 1)))
+
+	// The exponent sits in a field the struct does not know, so the document reaches
+	// the canonical form instead of dying in a Go-specific decode error. The point is
+	// the rule, and the rule lives in the canonicaliser.
+	withExtra := signRawFixture(t, fixtureBody(`,"extra":7`), priv)
+	add("exponent_preserving_value",
+		"7e0 parses to the same 7 the issuer signed, so the signature VERIFIES over "+
+			"bytes that were never produced. The rewrite is invisible to every check "+
+			"made after parsing",
+		"whole numbers only",
+		[]byte(strings.Replace(string(withExtra), `"extra":7`, `"extra":7e0`, 1)))
+
+	// Signed with a literal U+FFFD, then delivered with the escape that Go maps ONTO
+	// U+FFFD. The canonical form is identical, so the signature holds.
+	//
+	// This one is asymmetric and the asymmetry is the lesson: JavaScript keeps the
+	// lone surrogate, so a JS verifier refuses this document on the signature, while
+	// Go — and any decoder that substitutes the replacement character — accepts it.
+	// Neither implementation can tell from its own behaviour that the other is at
+	// risk, which is why the check belongs in the contract rather than in whichever
+	// language noticed first.
+	withReplacement := signRawFixture(t, fixtureBody(`,"note":"�"`), priv)
+	add("surrogate_rewrite",
+		"a signed U+FFFD rewritten as \\ud800 still VERIFIES anywhere the decoder "+
+			"substitutes the replacement character, Go included; the verifier would be "+
+			"vouching for bytes nobody signed",
+		"surrogate",
+		[]byte(strings.Replace(string(withReplacement), "�", `\ud800`, 1)))
 
 	// Codec refusals. The signature on these is a placeholder: each is refused before
 	// verification reaches it, by the rule the vector is named for.

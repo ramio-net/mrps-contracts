@@ -1,12 +1,13 @@
 {
   "_note": "TEST VECTORS. The keys below are derived from constants in this repository and must never be trusted by a production verifier.",
   "_implementers_note": [
+    "MANDATORY. The three checks below are not diagnostics and not politeness: a verifier that skips them will ACCEPT documents that were never signed. They are listed separately only because an ordinary JSON parser cannot perform them — by the time it returns, the evidence is gone.",
+    "Duplicate object keys: JSON.parse and Go both keep the LAST value, so a forged pair placed BEFORE the signed one leaves the parsed value untouched — the signature verifies, and any consumer whose parser takes the first value instead reads the forged one. Vector duplicate_key_shadowing is a document a verifier without a raw duplicate scan accepts. Scan the raw bytes.",
+    "Fractions and exponents: after parsing, 7e0 and 7 are the same value, so rewriting a signed 7 as 7e0 changes the bytes without changing what the parser sees. The signature then verifies over content the issuer never produced. Vector exponent_preserving_value shows it. Reject them from the RAW text, before parsing.",
+    "Unpaired surrogate escapes: Go silently replaces them with U+FFFD, so a signed U+FFFD can be rewritten as \\ud800 and still verify. Vector surrogate_rewrite shows it. Reject them from the raw text.",
+    "Whole numbers stay within ±(2^53−1) so JSON.parse remains exact. This one IS sufficient on its own: inside that range no two distinct integers round together, which is what removes the same attack for numbers.",
     "The vector NAME is the portable reason code; expected_error is what the Go reference prints and will read differently in another language.",
-    "Duplicate object keys: JSON.parse keeps the last value silently. A verifier must scan the raw bytes for repeated keys itself, or a document that means two things will be accepted as though it meant one.",
-    "Fractions and exponents: after JSON.parse, 7e2 and 700 are the same value and 1.0 and 1 are the same value. A verifier must reject them from the RAW text, before parsing, or it cannot tell it was handed a form this contract does not allow.",
-    "Unpaired surrogate escapes: JavaScript keeps them, Go replaces them with U+FFFD. Reject them from the raw text so neither side canonicalises something other than what arrived.",
-    "Whole numbers stay within ±(2^53−1) precisely so JSON.parse remains exact; nothing else is needed for numbers.",
-    "None of these gaps can cause a WRONG ACCEPT across implementations — a document one side refuses is one the other refuses too, if for a different stated reason. They are listed so a reviewer does not read silence as agreement."
+    "Put another way: verifying a signature proves the CANONICAL FORM was signed. It says nothing about the bytes that arrived unless the canonical form can be reached from those bytes one way only. These checks are what makes that true."
   ],
   "key": {
     "key_id": "fixture-0",
@@ -133,6 +134,27 @@
       "stage": "verify_document",
       "expected_error": "trailing content",
       "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}}"
+    },
+    {
+      "name": "duplicate_key_shadowing",
+      "why": "the forged pair is placed BEFORE the signed one, so a last-value-wins parser reproduces the signed form exactly and the signature VERIFIES; a consumer whose parser takes the first value reads 9 where the issuer wrote 7. Without a raw duplicate scan this document is accepted",
+      "stage": "verify_document",
+      "expected_error": "duplicate key",
+      "document": "{\"schema_version\":3,\"profile_id\":\"9f1e2d3c-0000-4000-8000-000000000001\",\"revision\":9,\"revision\":7,\"subject\":{\"installation_id\":\"6d79cb18-0da4-4f11-9e6b-f6defe8e211e\",\"edge_id\":\"152b9f17-5410-4178-a4d3-d00a62c39559\",\"org_id\":\"10000000-0000-4000-8000-000000000001\"},\"issued_at\":\"2026-09-08T12:00:00Z\",\"offline_window_sec\":604800,\"registered\":{\"limits\":{\"max_cameras\":4,\"config_editable\":false},\"features\":{\"multi_stream\":false,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3},\"full\":{\"limits\":{\"max_cameras\":8,\"config_editable\":true},\"features\":{\"multi_stream\":true,\"studio_node_transport\":false,\"edge_local_config_ui\":false,\"mrps_console_sync\":true,\"remote_control\":false,\"telemetry_upload\":true,\"operational_profile\":false},\"conditions_revision\":3,\"valid_from\":\"2026-09-08T12:00:00Z\",\"valid_until\":\"2026-10-08T12:00:00Z\"},\"key_id\":\"fixture-0\",\"signature\":\"bRVyi7lEJ+Amwj92jVRKG40EzLrYn6fwBjDLlZq4lfwuVgmhTE8rU7pypl1lX2ZK9Kue4H422WLt7k7lcr/ZAg==\"}"
+    },
+    {
+      "name": "exponent_preserving_value",
+      "why": "7e0 parses to the same 7 the issuer signed, so the signature VERIFIES over bytes that were never produced. The rewrite is invisible to every check made after parsing",
+      "stage": "verify_document",
+      "expected_error": "whole numbers only",
+      "document": "{\"extra\":7e0,\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"udauf3LgMoqLt8COZe5Bfbw5b3YtRSl+Oj0f9btzF1gTPimI/sxfxFPOqcM43Y3sRYrOdXPpPaA0lyzR0rk8AA==\",\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}"
+    },
+    {
+      "name": "surrogate_rewrite",
+      "why": "a signed U+FFFD rewritten as \\ud800 still VERIFIES anywhere the decoder substitutes the replacement character, Go included; the verifier would be vouching for bytes nobody signed",
+      "stage": "verify_document",
+      "expected_error": "surrogate",
+      "document": "{\"issued_at\":\"2026-09-09T12:00:00Z\",\"key_id\":\"fixture-0\",\"note\":\"\\ud800\",\"offline_window_sec\":259200,\"profile_id\":\"p-1\",\"registered\":{\"conditions_revision\":1,\"features\":{\"edge_local_config_ui\":true,\"mrps_console_sync\":true,\"multi_stream\":false,\"operational_profile\":false,\"remote_control\":false,\"studio_node_transport\":false,\"telemetry_upload\":true},\"limits\":{\"config_editable\":false,\"max_cameras\":4}},\"revision\":1,\"schema_version\":3,\"signature\":\"PGaQDj3XE80LAbOrzkO/FcJXVCIleuMkiXvztBlFm3GsOChi+grz4PuAWIOnLLfZo+mzNHdm8qwx67Tg52PRAw==\",\"subject\":{\"edge_id\":\"e-1\",\"installation_id\":\"i-1\",\"org_id\":\"o-1\"}}"
     },
     {
       "name": "fractional_number",
