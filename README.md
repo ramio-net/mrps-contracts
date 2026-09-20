@@ -24,7 +24,7 @@
 
 | Пакет | Что внутри |
 |---|---|
-| `capability` | Capability Profile v2, канонизация RFC 8785, подпись Ed25519, golden-вектора |
+| `capability` | Capability Profile v2/v3, канонизация, подпись Ed25519, ограничения ключей, golden-вектора |
 | `sessioncfg` | SessionConfig v2, границы значений (взяты из работающего Edge), значения по умолчанию |
 | `health` | DTO телеметрии: снимок состояния камеры и вычисленное состояние |
 | `protocol` | HMAC-подпись запросов Edge → Cloud, конверты сообщений, `SessionReport` |

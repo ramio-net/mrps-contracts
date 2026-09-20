@@ -20,4 +20,17 @@
   still verifies and reproduces the same signature. Withdrawal and no automatic
   dev/demo trust have separate controls.
 - Local go vet ./..., go build ./... and go test ./... -race -count=1 passed.
-  CI and Cloud candidate rehearsal follow before requesting final review.
+  TestVerifyV2 passed ten repetitions. Implementation f41c51a passed CI:
+  https://github.com/ramio-net/mrps-contracts/actions/runs/35524996012
+- Cloud main 346b6bd passed go test ./cmd/... ./internal/... ./migrations -count=1
+  and vet against this candidate using an ignored, isolated modfile/replace.
+  Database integration was disabled for this candidate rehearsal. Cloud's real
+  go.mod/go.sum stayed unchanged on v0.8.0; no branch pin or module-cache patch.
+- Cloud's independent JS verifier preserved all historical canonical/signing
+  bytes: 9 positive and 23 negative vectors, including duplicate-key, exponent
+  and surrogate controls. Existing schema2/schema3 fixtures and codecs have no diff.
+- The first broad Cloud go test ./... included the customer's read-only reference
+  go/ directory and failed on its Edge-only imports. It was not edited or supplied
+  new dependencies; the successful rerun used exactly Cloud CI's product packages.
+- No tag/merge, production keys, Cloud deployment or Edge installation was changed.
+  Review and then a released tag are required before consumer adoption.
