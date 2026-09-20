@@ -10,3 +10,14 @@
 - Plan and acceptance are in spec/SCHEMA2_WINDOW_VERIFICATION.md. Implementation
   and executable evidence follow in this PR. Real public/private keys are not
   installed, embedded or tested here; only ephemeral/dedicated test material.
+- Draft PR #6 opened in the day of branch creation:
+  https://github.com/ramio-net/mrps-contracts/pull/6
+- Implemented VerifyV2ForSubject using existing mayIssue and VerifyForSubject.
+  No wire/codec/legacy API changes. TrustedKeys comments now also describe
+  consumer-provisioned embedded trust instead of assuming manifest-only delivery.
+- Thirty stage/reason vectors, input-immutability checks, honestly re-signed
+  constraint cases and legacy positive controls pass. The frozen v0.6.0 profile
+  still verifies and reproduces the same signature. Withdrawal and no automatic
+  dev/demo trust have separate controls.
+- Local go vet ./..., go build ./... and go test ./... -race -count=1 passed.
+  CI and Cloud candidate rehearsal follow before requesting final review.

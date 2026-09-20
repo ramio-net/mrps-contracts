@@ -1,6 +1,6 @@
 # Schema-2 verification with key constraints
 
-Status: agreed by Edge/Cloud, implementation in progress (2026-09-20).
+Status: implemented for review in PR #6 (2026-09-20), not released or adopted.
 Scope: an additive verifier, not a wire change, key rollout or format retirement.
 
 ## Agreement
@@ -67,3 +67,15 @@ suite. Cloud should also rehearse its existing tests against the candidate with
 an isolated modfile, without changing its released dependency pin. A contract
 PR does not by itself prove Edge adoption, live H2 negotiation or production
 key custody. No production private key belongs in tests, CI or this repository.
+
+## Implementation evidence
+
+VerifyV2ForSubject reuses mayIssue and then the frozen VerifyForSubject path.
+The only existing Go file changed is a trust-source comment in manifest.go;
+no old verifier, canonicalizer, wire DTO or fixture has been rewritten.
+
+Thirty table vectors pass, including legacy positive controls for constraints,
+plus historical signature/withdrawal and explicit-only development trust checks.
+Local go vet, go build and go test ./... -race -count=1 pass. CI/release review
+and the candidate Cloud rehearsal are recorded in WORKLOG.md. The release tag
+is deliberately not created here; consumers continue their current pinned tag.
