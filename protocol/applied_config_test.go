@@ -89,3 +89,88 @@ func TestSessionConfigVersionOmittedWithoutConfig(t *testing.T) {
 		t.Fatalf("nil session config must still encode as explicit null: %s", raw)
 	}
 }
+
+func TestSyncNegotiationFieldsRoundTrip(t *testing.T) {
+	request := SyncRequest{
+		InstallationID:          "install-1",
+		EdgeID:                  "edge-1",
+		KnownKeyIDs:             []string{"p0", "p1"},
+		SupportedSchemaVersions: []int{2, 3},
+	}
+
+	raw, err := json.Marshal(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		`"supported_schema_versions":[2,3]`,
+		`"known_key_ids":["p0","p1"]`,
+	} {
+		if !strings.Contains(string(raw), want) {
+			t.Fatalf("sync negotiation vector missing %s: %s", want, raw)
+		}
+	}
+
+	var back SyncRequest
+	if err := json.Unmarshal(raw, &back); err != nil {
+		t.Fatal(err)
+	}
+	if got := strings.Join(back.KnownKeyIDs, ","); got != "p0,p1" {
+		t.Fatalf("known key ids = %q, want p0,p1", got)
+	}
+	if got := len(back.SupportedSchemaVersions); got != 2 ||
+		back.SupportedSchemaVersions[0] != 2 ||
+		back.SupportedSchemaVersions[1] != 3 {
+		t.Fatalf("supported schema versions = %+v, want [2 3]", back.SupportedSchemaVersions)
+	}
+}
+
+func TestSyncNegotiationFieldsAbsentVector(t *testing.T) {
+	raw, err := json.Marshal(SyncRequest{InstallationID: "install-1", EdgeID: "edge-1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(raw), "known_key_ids") {
+		t.Fatalf("absent known_key_ids must stay absent: %s", raw)
+	}
+	if strings.Contains(string(raw), "supported_schema_versions") {
+		t.Fatalf("absent supported_schema_versions must stay absent: %s", raw)
+	}
+
+	var back SyncRequest
+	if err := json.Unmarshal(raw, &back); err != nil {
+		t.Fatal(err)
+	}
+	if back.KnownKeyIDs != nil {
+		t.Fatalf("absent known_key_ids decoded to %+v, want nil", back.KnownKeyIDs)
+	}
+	if back.SupportedSchemaVersions != nil {
+		t.Fatalf("absent supported_schema_versions decoded to %+v, want nil", back.SupportedSchemaVersions)
+	}
+}
+
+func TestSyncNegotiationFieldsEmptyListVector(t *testing.T) {
+	raw := []byte(`{"installation_id":"install-1","edge_id":"edge-1","known_key_ids":[],"supported_schema_versions":[]}`)
+
+	var back SyncRequest
+	if err := json.Unmarshal(raw, &back); err != nil {
+		t.Fatal(err)
+	}
+	if back.KnownKeyIDs == nil || len(back.KnownKeyIDs) != 0 {
+		t.Fatalf("empty known_key_ids decoded to %+v, want empty non-nil slice", back.KnownKeyIDs)
+	}
+	if back.SupportedSchemaVersions == nil || len(back.SupportedSchemaVersions) != 0 {
+		t.Fatalf("empty supported_schema_versions decoded to %+v, want empty non-nil slice", back.SupportedSchemaVersions)
+	}
+
+	echo, err := json.Marshal(back)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(echo), "known_key_ids") {
+		t.Fatalf("empty known_key_ids must not authorize a wire upgrade: %s", echo)
+	}
+	if strings.Contains(string(echo), "supported_schema_versions") {
+		t.Fatalf("empty supported_schema_versions must not authorize a wire upgrade: %s", echo)
+	}
+}
