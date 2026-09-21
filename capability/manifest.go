@@ -84,7 +84,9 @@ type ManifestKey struct {
 	Revoked bool `json:"revoked,omitempty"`
 }
 
-// TrustedKey is a public key together with what the manifest permits it to sign.
+// TrustedKey is a public key together with what it is permitted to sign.
+// The consumer provisions trust, for example in its embedded key set or from
+// a verified manifest. Unverified profile/sync fields must not create trust.
 //
 // The constraints travel WITH the key rather than beside it, and VerifyV3 accepts
 // nothing else. Cloud's review found the earlier shape handed verification a bare map
@@ -92,6 +94,7 @@ type ManifestKey struct {
 // signing window had closed, both verified a schema 3 document issued afterwards: the
 // restrictions were written down and then dropped one call later. Carrying them in
 // the type is what makes dropping them impossible rather than merely discouraged.
+// VerifyV2ForSubject also consumes these constraints, using the frozen v2 codec.
 type TrustedKey struct {
 	PublicKey             ed25519.PublicKey
 	AllowedSchemaVersions []int
@@ -99,7 +102,7 @@ type TrustedKey struct {
 	SigningUntil          *time.Time
 }
 
-// TrustedKeys is the set VerifyV3 works against.
+// TrustedKeys is the set VerifyV3 and VerifyV2ForSubject work against.
 type TrustedKeys map[string]TrustedKey
 
 // mayIssue reports whether this key was permitted to sign that document.
