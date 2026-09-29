@@ -13,7 +13,25 @@ type ClaimRequest struct {
 	InstallationID string `json:"installation_id"`
 	EdgeVersion    string `json:"edge_version"`
 	OS             string `json:"os"`
+	// Hostname is the name of the machine Edge runs on. Cloud uses it as the Edge's name
+	// when the owner confirms the code without naming it: a list of cards all called
+	// "MRPS Edge" and told apart by an id was a finding of the owner's Console review of
+	// 28.09.2026. Cloud cleans and bounds it, uses it only when the owner leaves the name at
+	// its default, and falls back to a neutral name when it is empty. Optional; absent from
+	// Edges older than contract v0.10.0.
+	Hostname string `json:"hostname,omitempty"`
+	// EdgeKind is what this Edge IS — see the EdgeKind constants. Optional; absent means
+	// software, the only kind that exists today.
+	EdgeKind string `json:"edge_kind,omitempty"`
 }
+
+// Kinds of Edge. The difference matters beyond the card's icon: blocking a lost laptop and
+// blocking a stolen box are different decisions for an owner, and only the box has an
+// identity that survives a reinstall.
+const (
+	EdgeKindSoftware = "software"
+	EdgeKindHardware = "hardware"
+)
 
 type ClaimRequestResponse struct {
 	Code      string    `json:"code"`
@@ -79,7 +97,31 @@ type SyncRequest struct {
 	// getting the previous key until they catch up. Switching the fleet because N
 	// days have passed is how a rotation turns into an outage.
 	KnownKeyIDs []string `json:"known_key_ids,omitempty"`
+
+	// Hostname and EdgeKind as in ClaimRequest, repeated on every sync so a venue linked
+	// before contract v0.10.0 — or moved to a renamed machine — is described without being
+	// linked again. They update what Cloud knows about the machine; they never rename an Edge
+	// the owner has named. Optional.
+	Hostname string `json:"hostname,omitempty"`
+	EdgeKind string `json:"edge_kind,omitempty"`
+
+	// SupportedFeatures names the behaviours this Edge build implements that Cloud must not
+	// assume — see the Feature constants. Absent from Edges older than contract v0.10.0.
+	// It rides the SIGNED sync on purpose: ClaimRequest is not authenticated, and a feature
+	// Cloud acts on must be vouched for by the Edge's own secret. Cloud ignores names it does
+	// not know. Proposed by Cloud (29.09.2026) in place of inferring support from EdgeKind:
+	// the kind of machine and the version of the protocol are different axes.
+	SupportedFeatures []string `json:"supported_features,omitempty"`
 }
+
+// Features an Edge declares in SyncRequest.SupportedFeatures.
+const (
+	// FeatureReleasedV1: this Edge understands TrustStateReleased — on receiving it, it drops
+	// its credentials and shows a new link code by itself. Console offers "Unlink" only for an
+	// Edge whose latest signed sync carried it; to an Edge without it, unlinking would look
+	// like a revoke it does not understand.
+	FeatureReleasedV1 = "released_v1"
+)
 
 // AppliedConfig names one delivered configuration exactly.
 //
@@ -139,8 +181,40 @@ type SyncResponse struct {
 	SessionConfigVersion int       `json:"session_config_version,omitempty"`
 	ServerTime           time.Time `json:"server_time"`
 	NextSyncAfterSec     int       `json:"next_sync_after_sec"`
-	TrustState           string    `json:"trust_state,omitempty"`
+	// TrustState is one of the TrustState constants. A reader keeps its credentials on a
+	// value it does not know: guessing "released" or "revoked" from an unknown word would
+	// throw away a link that may be perfectly good.
+	TrustState string `json:"trust_state,omitempty"`
+	// EdgeName is what the owner called this Edge in Console. Edge shows it on its own panel
+	// ("linked as …"), so the person at the venue and the owner at Console name the same
+	// machine the same way. Optional.
+	EdgeName string `json:"edge_name,omitempty"`
 }
+
+// Trust states Cloud reports in SyncResponse.TrustState.
+const (
+	TrustStateRegistered = "registered"
+	// TrustStateRevoked: the owner BLOCKED this Edge ("lost / stolen"). Only that owner can
+	// bring it back, by allowing recovery in Console first.
+	TrustStateRevoked = "revoked"
+	// TrustStateReleased: the owner UNLINKED this Edge — the ordinary way to part with one.
+	// A released Edge is free: it drops its credentials, returns to "not linked" and shows a
+	// new code by itself, and any account may confirm that code with no recovery grant. The
+	// same account gets its card back with the history; another account gets a new card;
+	// paid rights stay with the account that holds them (they are the organization's, not
+	// the Edge's).
+	//
+	// The old secret after unlinking (agreed with Cloud 29.09.2026): it authenticates the
+	// signed sync ONLY, so the Edge can learn it was released — no telemetry, reports or
+	// terms are served on it. Every such sync may answer "released" again, which survives a
+	// lost response. Cloud retires the secret atomically when the NEXT link completes (a new
+	// secret is issued), not on the unauthenticated claim request: otherwise anyone who knows
+	// the public installation_id could kill a working secret with one request.
+	//
+	// Console offers unlinking only for an Edge that declared FeatureReleasedV1. An Edge
+	// without it keeps its credentials on this value (see TrustState).
+	TrustStateReleased = "released"
+)
 
 type TelemetryUploadRequest struct {
 	InstallationID string `json:"installation_id"`
@@ -204,6 +278,46 @@ type EdgeRuntime struct {
 	// Capability is what Edge observes about its own permissions. It grants nothing
 	// and replaces no signature — Cloud decides rights, Edge reports what it applied.
 	Capability *CapabilityState `json:"capability,omitempty"`
+
+	// Everything below was added in contract v0.10.0, from the owner's Console review of
+	// 28.09.2026, where the Edge screen had fields for these and nothing to fill them with.
+
+	// Transport is the phone→Edge SRT mode this Edge runs: "file" or "live".
+	Transport string `json:"transport,omitempty"`
+	// MaxCamerasInForce is the camera ceiling Edge enforces right now. It may be ABOVE the
+	// limit in Capability.Current: a broadcast keeps the ceiling it started under when the
+	// terms drop mid-show, and only Edge knows that — Cloud cannot derive it. This is the
+	// number to put after "cameras 3 of …".
+	MaxCamerasInForce *int `json:"max_cameras_in_force,omitempty"`
+	// SessionElapsedSec is how long the current broadcast has been running, computed on
+	// Edge from Edge's own clock, so no two clocks are ever compared. Absent when idle.
+	SessionElapsedSec *int `json:"session_elapsed_sec,omitempty"`
+	// Warnings are what the Edge's own panel lists right now. NOT omitempty on purpose: an
+	// Edge that reports them sends [] when there is nothing to say, and an absent field
+	// means an Edge too old to report — which Console must show as "not reported", never as
+	// "no warnings". Until v0.10.0 the Edge screen said "Warnings: not reported" forever,
+	// and not one warning an operator saw on site ever reached the owner.
+	Warnings []RuntimeWarning `json:"warnings"`
+}
+
+// RuntimeWarning is one line of the Edge panel's warning list.
+//
+// Code names it so Console can say it in its own language and pick its own cure text;
+// Params carry the values that line is about (which camera, how many milliseconds, since
+// when) under the stable keys WarningParamSpecFor lists for the code; Message is the panel's
+// line verbatim.
+//
+// How a reader shows one: a known code with every required param present → its own
+// template with the params filled in. Anything else — an unknown code, a missing required
+// param, an Edge older than the params — → Message, whole. Message is therefore always
+// sent and never dropped: a warning that vanishes because a reader was older than the
+// writer is the same silent failure this field exists to end. Unknown param keys are
+// ignored. Params proposed by Cloud (29.09.2026): a code picks the sentence, but the
+// numbers inside it cannot be localized from the English line.
+type RuntimeWarning struct {
+	Code    string            `json:"code"`
+	Params  map[string]string `json:"params,omitempty"`
+	Message string            `json:"message"`
 }
 
 type RuntimeCamera struct {

@@ -1,5 +1,40 @@
 # MRPS Contracts Worklog
 
+## 2026-09-29: v0.10.0 proposal — what the Console review found missing (Б)
+
+- From the owner's Console review of 28.09 and the dress rehearsal the same evening.
+  Branch feat/edge-runtime-b from main 0bf1e88. Proposal only: no tag until Cloud has
+  reviewed it, and Edge does not adopt it before the broadcast of 7.10 (the broadcast
+  build stays on v0.9.0).
+- EdgeRuntime gains Transport, MaxCamerasInForce (the ceiling a broadcast keeps when
+  terms drop mid-show — Cloud cannot derive it), SessionElapsedSec (computed on Edge, no
+  two clocks compared) and Warnings ([]RuntimeWarning{Code, Message}, NOT omitempty: []
+  means "nothing to say", absent means "Edge too old to report"). Codes in
+  protocol/warnings.go, one per line of the Edge panel's list; unknown codes are shown
+  by their message, never dropped.
+- ClaimRequest and SyncRequest gain Hostname and EdgeKind (software/hardware);
+  SyncResponse gains EdgeName (the name the owner gave in Console, for the Edge panel).
+- TrustState constants, with TrustStateReleased: the owner UNLINKED the Edge — free to be
+  linked again by any account with no recovery grant — as opposed to revoked (BLOCKED,
+  only its owner brings it back). Cloud keeps answering the old secret on sync until it
+  has delivered the state, as it does for revoked.
+- sessioncfg.RecommendedPlayoutMs: floor 280 → 400. Every config now starts at 400, the
+  margin confirmed 29.08, on 06.09 and in the rehearsal of 28.09; a venue linked afresh
+  was getting 280.
+- All new fields are optional/additive; old requests keep their exact shape (tested).
+  go vet, go test ./... -race pass.
+- Cloud's review (PR #8 comment, 29.09) — all four answers taken as proposed:
+  RuntimeWarning.Params (map[string]string, optional) with the keys of every code in
+  protocol/warnings.go (WarningParamSpecFor, required/optional, one fixed value form per
+  kind); Console localizes a known code with all required params and shows Message
+  otherwise. SyncRequest.SupportedFeatures with FeatureReleasedV1 — support for "released"
+  is declared on the signed sync, not inferred from EdgeKind. The old secret after
+  unlinking serves the signed sync only and is retired when the NEXT link completes, not
+  on the unauthenticated claim request. Hostname names an Edge only at confirm and never
+  renames one the owner named. New tests: a wire vector for Console, pre-params decoding,
+  the spec table (mutation-checked: an undocumented key, a duplicate key, a shared slice
+  are each caught).
+
 ## 2026-09-20: schema-2 signing-window follow-up
 
 - Edge and Cloud agreed to add a constrained schema-2 verifier, keeping signed
