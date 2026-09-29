@@ -16,7 +16,9 @@ type ClaimRequest struct {
 	// Hostname is the name of the machine Edge runs on. Cloud uses it as the Edge's name
 	// when the owner confirms the code without naming it: a list of cards all called
 	// "MRPS Edge" and told apart by an id was a finding of the owner's Console review of
-	// 28.09.2026. Optional; absent from Edges older than contract v0.10.0.
+	// 28.09.2026. Cloud cleans and bounds it, uses it only when the owner leaves the name at
+	// its default, and falls back to a neutral name when it is empty. Optional; absent from
+	// Edges older than contract v0.10.0.
 	Hostname string `json:"hostname,omitempty"`
 	// EdgeKind is what this Edge IS — see the EdgeKind constants. Optional; absent means
 	// software, the only kind that exists today.
@@ -98,10 +100,28 @@ type SyncRequest struct {
 
 	// Hostname and EdgeKind as in ClaimRequest, repeated on every sync so a venue linked
 	// before contract v0.10.0 — or moved to a renamed machine — is described without being
-	// linked again. Optional.
+	// linked again. They update what Cloud knows about the machine; they never rename an Edge
+	// the owner has named. Optional.
 	Hostname string `json:"hostname,omitempty"`
 	EdgeKind string `json:"edge_kind,omitempty"`
+
+	// SupportedFeatures names the behaviours this Edge build implements that Cloud must not
+	// assume — see the Feature constants. Absent from Edges older than contract v0.10.0.
+	// It rides the SIGNED sync on purpose: ClaimRequest is not authenticated, and a feature
+	// Cloud acts on must be vouched for by the Edge's own secret. Cloud ignores names it does
+	// not know. Proposed by Cloud (29.09.2026) in place of inferring support from EdgeKind:
+	// the kind of machine and the version of the protocol are different axes.
+	SupportedFeatures []string `json:"supported_features,omitempty"`
 }
+
+// Features an Edge declares in SyncRequest.SupportedFeatures.
+const (
+	// FeatureReleasedV1: this Edge understands TrustStateReleased — on receiving it, it drops
+	// its credentials and shows a new link code by itself. Console offers "Unlink" only for an
+	// Edge whose latest signed sync carried it; to an Edge without it, unlinking would look
+	// like a revoke it does not understand.
+	FeatureReleasedV1 = "released_v1"
+)
 
 // AppliedConfig names one delivered configuration exactly.
 //
@@ -182,10 +202,17 @@ const (
 	// new code by itself, and any account may confirm that code with no recovery grant. The
 	// same account gets its card back with the history; another account gets a new card;
 	// paid rights stay with the account that holds them (they are the organization's, not
-	// the Edge's). Cloud keeps answering the old secret on sync — and on sync only — until it
-	// has delivered this state, exactly as it does for revoked. An Edge older than contract
-	// v0.10.0 does not know the value and keeps its credentials; it falls silent once the
-	// secret is retired, and needs a new link after its upgrade.
+	// the Edge's).
+	//
+	// The old secret after unlinking (agreed with Cloud 29.09.2026): it authenticates the
+	// signed sync ONLY, so the Edge can learn it was released — no telemetry, reports or
+	// terms are served on it. Every such sync may answer "released" again, which survives a
+	// lost response. Cloud retires the secret atomically when the NEXT link completes (a new
+	// secret is issued), not on the unauthenticated claim request: otherwise anyone who knows
+	// the public installation_id could kill a working secret with one request.
+	//
+	// Console offers unlinking only for an Edge that declared FeatureReleasedV1. An Edge
+	// without it keeps its credentials on this value (see TrustState).
 	TrustStateReleased = "released"
 )
 
@@ -276,13 +303,21 @@ type EdgeRuntime struct {
 // RuntimeWarning is one line of the Edge panel's warning list.
 //
 // Code names it so Console can say it in its own language and pick its own cure text;
-// Message is the panel's line verbatim, and it carries the numbers (which camera, how many
-// milliseconds, since when). A code Console does not know is shown by its message, never
-// dropped: a warning that vanishes because a reader was older than the writer is the same
-// silent failure this field exists to end.
+// Params carry the values that line is about (which camera, how many milliseconds, since
+// when) under the stable keys WarningParamSpecFor lists for the code; Message is the panel's
+// line verbatim.
+//
+// How a reader shows one: a known code with every required param present → its own
+// template with the params filled in. Anything else — an unknown code, a missing required
+// param, an Edge older than the params — → Message, whole. Message is therefore always
+// sent and never dropped: a warning that vanishes because a reader was older than the
+// writer is the same silent failure this field exists to end. Unknown param keys are
+// ignored. Params proposed by Cloud (29.09.2026): a code picks the sentence, but the
+// numbers inside it cannot be localized from the English line.
 type RuntimeWarning struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
+	Code    string            `json:"code"`
+	Params  map[string]string `json:"params,omitempty"`
+	Message string            `json:"message"`
 }
 
 type RuntimeCamera struct {

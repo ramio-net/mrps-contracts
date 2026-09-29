@@ -23,6 +23,17 @@
   was getting 280.
 - All new fields are optional/additive; old requests keep their exact shape (tested).
   go vet, go test ./... -race pass.
+- Cloud's review (PR #8 comment, 29.09) — all four answers taken as proposed:
+  RuntimeWarning.Params (map[string]string, optional) with the keys of every code in
+  protocol/warnings.go (WarningParamSpecFor, required/optional, one fixed value form per
+  kind); Console localizes a known code with all required params and shows Message
+  otherwise. SyncRequest.SupportedFeatures with FeatureReleasedV1 — support for "released"
+  is declared on the signed sync, not inferred from EdgeKind. The old secret after
+  unlinking serves the signed sync only and is retired when the NEXT link completes, not
+  on the unauthenticated claim request. Hostname names an Edge only at confirm and never
+  renames one the owner named. New tests: a wire vector for Console, pre-params decoding,
+  the spec table (mutation-checked: an undocumented key, a duplicate key, a shared slice
+  are each caught).
 
 ## 2026-09-20: schema-2 signing-window follow-up
 
