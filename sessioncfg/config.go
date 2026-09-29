@@ -139,16 +139,23 @@ func DefaultOperational(v Video) Operational {
 // resolution and bitrate mean more airtime pressure, more arrival jitter, and more
 // buffer needed to keep several cameras aligned.
 //
-// The floor is 280 ms because two real handsets said so. Measured 2026-07-29 on a
-// two-camera run at 720p30: one model was clean from 280 ms, the other from 240.
-// The buffer is one for the whole session and is set by the worst camera, so 280 is
-// the value at which both are clean. The earlier floor of 180 came from a
-// single-camera calibration and was below what multi-camera actually needs — a
-// session started there spends its first minutes repeating frames while the operator
-// hunts for the knob.
+// The floor is 400 ms since 2026-09-29, and with the 400 ms ceiling Validate enforces the
+// load-aware part below no longer binds: every video config starts at 400.
 //
-// This is only the sensible starting point. The operator knob and the history-based
-// per-device recommendation on Edge sit above it.
+// History. 280 came from two handsets on 2026-07-29 (720p30, two cameras: one model clean
+// from 280, the other from 240), and it went on being the default after the field had
+// moved: 400 was confirmed as the margin on 29.08 (0.1–0.7% repeats on three cameras, the
+// rest at 280), carried the cleanest broadcast so far on 06.09 (six hours, 0.0006% /
+// 0.0017%), and the dress rehearsal of 28.09 ran thirty minutes on three phones at 400
+// without a single repeated frame. A venue linked afresh got 280 from Cloud nonetheless —
+// found in the owner's Console review of 28.09 — and would have started a multi-camera
+// broadcast below the margin it needs. The earlier floor of 180 was a single-camera
+// calibration; single-camera work picks its own lower preset explicitly.
+//
+// This is only the starting point. The operator knob, the Cloud presets and the
+// history-based per-device recommendation on Edge sit above it.
+const recommendedPlayoutFloorMs = 400
+
 func RecommendedPlayoutMs(v Video) int {
 	base := 200
 	if v.Height >= 1080 {
@@ -158,8 +165,8 @@ func RecommendedPlayoutMs(v Video) int {
 		base += (v.BitrateKbps - 3300) * 15 / 1000
 	}
 	ms := ((base + 10) / 20) * 20
-	if ms < 280 {
-		return 280
+	if ms < recommendedPlayoutFloorMs {
+		return recommendedPlayoutFloorMs
 	}
 	if ms > 400 {
 		return 400

@@ -43,12 +43,12 @@ func TestRecommendedPlayoutMs(t *testing.T) {
 		video Video
 		want  int
 	}{
-		// 720p sits on the measured multi-camera floor; above it the load-aware
-		// part decides and the floor stops binding.
-		{Video{Height: 720, BitrateKbps: 3300}, 280},
-		{Video{Height: 720, BitrateKbps: 6000}, 280},
-		{Video{Height: 1080, BitrateKbps: 6000}, 300},
-		{Video{Height: 1080, BitrateKbps: 8500}, 340},
+		// Every config starts on the margin the field confirmed (29.08, 06.09, 28.09):
+		// 400 is both the floor and the ceiling now.
+		{Video{Height: 720, BitrateKbps: 3300}, 400},
+		{Video{Height: 720, BitrateKbps: 6000}, 400},
+		{Video{Height: 1080, BitrateKbps: 6000}, 400},
+		{Video{Height: 1080, BitrateKbps: 8500}, 400},
 	}
 	for _, c := range cases {
 		if got := RecommendedPlayoutMs(c.video); got != c.want {

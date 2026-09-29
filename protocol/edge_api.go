@@ -13,7 +13,23 @@ type ClaimRequest struct {
 	InstallationID string `json:"installation_id"`
 	EdgeVersion    string `json:"edge_version"`
 	OS             string `json:"os"`
+	// Hostname is the name of the machine Edge runs on. Cloud uses it as the Edge's name
+	// when the owner confirms the code without naming it: a list of cards all called
+	// "MRPS Edge" and told apart by an id was a finding of the owner's Console review of
+	// 28.09.2026. Optional; absent from Edges older than contract v0.10.0.
+	Hostname string `json:"hostname,omitempty"`
+	// EdgeKind is what this Edge IS — see the EdgeKind constants. Optional; absent means
+	// software, the only kind that exists today.
+	EdgeKind string `json:"edge_kind,omitempty"`
 }
+
+// Kinds of Edge. The difference matters beyond the card's icon: blocking a lost laptop and
+// blocking a stolen box are different decisions for an owner, and only the box has an
+// identity that survives a reinstall.
+const (
+	EdgeKindSoftware = "software"
+	EdgeKindHardware = "hardware"
+)
 
 type ClaimRequestResponse struct {
 	Code      string    `json:"code"`
@@ -79,6 +95,12 @@ type SyncRequest struct {
 	// getting the previous key until they catch up. Switching the fleet because N
 	// days have passed is how a rotation turns into an outage.
 	KnownKeyIDs []string `json:"known_key_ids,omitempty"`
+
+	// Hostname and EdgeKind as in ClaimRequest, repeated on every sync so a venue linked
+	// before contract v0.10.0 — or moved to a renamed machine — is described without being
+	// linked again. Optional.
+	Hostname string `json:"hostname,omitempty"`
+	EdgeKind string `json:"edge_kind,omitempty"`
 }
 
 // AppliedConfig names one delivered configuration exactly.
@@ -139,8 +161,33 @@ type SyncResponse struct {
 	SessionConfigVersion int       `json:"session_config_version,omitempty"`
 	ServerTime           time.Time `json:"server_time"`
 	NextSyncAfterSec     int       `json:"next_sync_after_sec"`
-	TrustState           string    `json:"trust_state,omitempty"`
+	// TrustState is one of the TrustState constants. A reader keeps its credentials on a
+	// value it does not know: guessing "released" or "revoked" from an unknown word would
+	// throw away a link that may be perfectly good.
+	TrustState string `json:"trust_state,omitempty"`
+	// EdgeName is what the owner called this Edge in Console. Edge shows it on its own panel
+	// ("linked as …"), so the person at the venue and the owner at Console name the same
+	// machine the same way. Optional.
+	EdgeName string `json:"edge_name,omitempty"`
 }
+
+// Trust states Cloud reports in SyncResponse.TrustState.
+const (
+	TrustStateRegistered = "registered"
+	// TrustStateRevoked: the owner BLOCKED this Edge ("lost / stolen"). Only that owner can
+	// bring it back, by allowing recovery in Console first.
+	TrustStateRevoked = "revoked"
+	// TrustStateReleased: the owner UNLINKED this Edge — the ordinary way to part with one.
+	// A released Edge is free: it drops its credentials, returns to "not linked" and shows a
+	// new code by itself, and any account may confirm that code with no recovery grant. The
+	// same account gets its card back with the history; another account gets a new card;
+	// paid rights stay with the account that holds them (they are the organization's, not
+	// the Edge's). Cloud keeps answering the old secret on sync — and on sync only — until it
+	// has delivered this state, exactly as it does for revoked. An Edge older than contract
+	// v0.10.0 does not know the value and keeps its credentials; it falls silent once the
+	// secret is retired, and needs a new link after its upgrade.
+	TrustStateReleased = "released"
+)
 
 type TelemetryUploadRequest struct {
 	InstallationID string `json:"installation_id"`
@@ -204,6 +251,38 @@ type EdgeRuntime struct {
 	// Capability is what Edge observes about its own permissions. It grants nothing
 	// and replaces no signature — Cloud decides rights, Edge reports what it applied.
 	Capability *CapabilityState `json:"capability,omitempty"`
+
+	// Everything below was added in contract v0.10.0, from the owner's Console review of
+	// 28.09.2026, where the Edge screen had fields for these and nothing to fill them with.
+
+	// Transport is the phone→Edge SRT mode this Edge runs: "file" or "live".
+	Transport string `json:"transport,omitempty"`
+	// MaxCamerasInForce is the camera ceiling Edge enforces right now. It may be ABOVE the
+	// limit in Capability.Current: a broadcast keeps the ceiling it started under when the
+	// terms drop mid-show, and only Edge knows that — Cloud cannot derive it. This is the
+	// number to put after "cameras 3 of …".
+	MaxCamerasInForce *int `json:"max_cameras_in_force,omitempty"`
+	// SessionElapsedSec is how long the current broadcast has been running, computed on
+	// Edge from Edge's own clock, so no two clocks are ever compared. Absent when idle.
+	SessionElapsedSec *int `json:"session_elapsed_sec,omitempty"`
+	// Warnings are what the Edge's own panel lists right now. NOT omitempty on purpose: an
+	// Edge that reports them sends [] when there is nothing to say, and an absent field
+	// means an Edge too old to report — which Console must show as "not reported", never as
+	// "no warnings". Until v0.10.0 the Edge screen said "Warnings: not reported" forever,
+	// and not one warning an operator saw on site ever reached the owner.
+	Warnings []RuntimeWarning `json:"warnings"`
+}
+
+// RuntimeWarning is one line of the Edge panel's warning list.
+//
+// Code names it so Console can say it in its own language and pick its own cure text;
+// Message is the panel's line verbatim, and it carries the numbers (which camera, how many
+// milliseconds, since when). A code Console does not know is shown by its message, never
+// dropped: a warning that vanishes because a reader was older than the writer is the same
+// silent failure this field exists to end.
+type RuntimeWarning struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
 
 type RuntimeCamera struct {
