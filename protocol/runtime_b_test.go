@@ -115,6 +115,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		WarningCapabilityUnreadable, WarningCapabilityMissing,
 		WarningSRTLatencyMismatch, WarningStartSpikeCured, WarningStartSpikeUncured,
 		WarningPacketLossPark, WarningPacketLossCamera, WarningOther,
+		WarningCalibDisturbedCured, WarningCalibDisturbedUncured, WarningPhoneDropsCamera,
 	} {
 		codes[c] = true
 	}
@@ -123,6 +124,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		ParamCamera, ParamCameras, ParamRunningMs, ParamAssignedMs, ParamAt, ParamEarlyRTTMs,
 		ParamSettledRTTMs, ParamLateMs, ParamLossPct, ParamOthersMaxPct, ParamOfflineSec,
 		ParamSinceSyncSec, ParamFreshSec, ParamLimitMin, ParamMinutesLeft, ParamLastError,
+		ParamCalibRTTMs, ParamFloorMs, ParamErrorMs, ParamDropPct,
 	} {
 		keys[k] = true
 	}

@@ -1,5 +1,22 @@
 # MRPS Contracts Worklog
 
+## 2026-10-07: v0.10.1 — three warning codes from the broadcast of 07.10 (additive)
+
+- Branch feat/v0.10.1-field-lessons from main 70b6332. Only additions: new codes and keys,
+  one Optional key on an existing code. A reader on v0.10.0 shows the new codes by their
+  message, as the contract already requires for unknown codes.
+- calib_disturbed_cured {camera, at, calib_rtt_ms, floor_ms, error_ms} / _uncured (no at) {camera, calib_rtt_ms, floor_ms,
+  error_ms}: a camera's clock measured while the phone was busy. 05.10 (after a call):
+  RTT 553 against a floor of 240, the camera ran ~145 ms early with 10-20% repeated
+  frames; 07.10 on air: RTT 367, ~57 ms early for 36 minutes, nothing on the panel. Edge
+  now re-measures by reconnecting the camera before it goes on air, once in 5 minutes;
+  the second time the operator presses Recalibrate.
+- phone_drops_camera {camera, drop_pct, others_max_pct?}: the phone discards frames from
+  its send queue — invisible as packet loss. 07.10: the handheld dropped up to 1100
+  frames a minute with zero SRT loss while the loss verdict blamed the wide shot alone.
+- packet_loss_park gains Optional drop_pct: the worst camera of a park-wide fault may be
+  losing frames on the phone rather than packets on the way.
+
 ## 2026-09-29: v0.10.0 proposal — what the Console review found missing (Б)
 
 - From the owner's Console review of 28.09 and the dress rehearsal the same evening.
