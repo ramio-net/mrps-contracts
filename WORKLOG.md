@@ -5,7 +5,7 @@
 - Branch feat/v0.10.1-field-lessons from main 70b6332. Only additions: new codes and keys,
   one Optional key on an existing code. A reader on v0.10.0 shows the new codes by their
   message, as the contract already requires for unknown codes.
-- calib_disturbed_cured / calib_disturbed_uncured {camera, at?, calib_rtt_ms, floor_ms,
+- calib_disturbed_cured {camera, at, calib_rtt_ms, floor_ms, error_ms} / _uncured (no at) {camera, calib_rtt_ms, floor_ms,
   error_ms}: a camera's clock measured while the phone was busy. 05.10 (after a call):
   RTT 553 against a floor of 240, the camera ran ~145 ms early with 10-20% repeated
   frames; 07.10 on air: RTT 367, ~57 ms early for 36 minutes, nothing on the panel. Edge
