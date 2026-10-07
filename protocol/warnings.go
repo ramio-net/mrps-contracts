@@ -38,6 +38,20 @@ const (
 	WarningPacketLossPark     = "packet_loss_park"     // every camera losing: look outside the system
 	WarningPacketLossCamera   = "packet_loss_camera"   // one camera losing: its bitrate
 
+	// v0.10.1, from the broadcast of 07.10.2026.
+	//
+	// A camera's clock is measured once per connection; measured while the phone was busy
+	// (just back from a call, the app restored) it carries that error for the whole
+	// connection, and the camera runs early or late against the others with every counter
+	// green. Edge re-measures by reconnecting the camera before it goes on air, once; the
+	// second time it is the operator's Recalibrate.
+	WarningCalibDisturbedCured   = "calib_disturbed_cured"   // Edge re-measured a camera's clock
+	WarningCalibDisturbedUncured = "calib_disturbed_uncured" // …and could not do it again: operator acts
+	// The phone discards frames before they reach the network: its send queue does not
+	// drain. Invisible as packet loss, and the cure is the same as for a losing camera — its
+	// own bitrate, or getting it closer to the router.
+	WarningPhoneDropsCamera = "phone_drops_camera"
+
 	// WarningOther is a line this contract has no code for yet. Show its message.
 	WarningOther = "other"
 )
@@ -67,6 +81,10 @@ const (
 	ParamLimitMin     = "limit_min"      // the session length limit
 	ParamMinutesLeft  = "minutes_left"   // minutes left before that limit
 	ParamLastError    = "last_error"     // Cloud's last answer, verbatim
+	ParamCalibRTTMs   = "calib_rtt_ms"   // round trip of the camera's clock measurement (v0.10.1)
+	ParamFloorMs      = "floor_ms"       // what an undisturbed measurement takes (v0.10.1)
+	ParamErrorMs      = "error_ms"       // up to how far the camera's clock may be off (v0.10.1)
+	ParamDropPct      = "drop_pct"       // share of frames the phone discarded before sending (v0.10.1)
 )
 
 // WarningParamSpec is what one code carries: Required keys are always sent with it,
@@ -96,10 +114,16 @@ var warningParams = map[string]WarningParamSpec{
 	WarningSRTLatencyMismatch: {Required: []string{ParamCamera, ParamRunningMs, ParamAssignedMs}},
 	WarningStartSpikeCured:    {Required: []string{ParamCamera, ParamAt, ParamEarlyRTTMs, ParamSettledRTTMs, ParamLateMs}},
 	WarningStartSpikeUncured:  {Required: []string{ParamCamera, ParamEarlyRTTMs, ParamSettledRTTMs, ParamLateMs}},
-	// The park verdict names the worst camera.
-	WarningPacketLossPark: {Required: []string{ParamCamera, ParamLossPct}},
+	// The park verdict names the worst camera; drop_pct (v0.10.1) when the worst one's loss
+	// is its phone discarding frames rather than packets lost on the way.
+	WarningPacketLossPark: {Required: []string{ParamCamera, ParamLossPct}, Optional: []string{ParamDropPct}},
 	// others_max_pct is absent when there is no other camera to compare with.
 	WarningPacketLossCamera: {Required: []string{ParamCamera, ParamLossPct}, Optional: []string{ParamOthersMaxPct}},
+
+	WarningCalibDisturbedCured:   {Required: []string{ParamCamera, ParamAt, ParamCalibRTTMs, ParamFloorMs, ParamErrorMs}},
+	WarningCalibDisturbedUncured: {Required: []string{ParamCamera, ParamCalibRTTMs, ParamFloorMs, ParamErrorMs}},
+	// others_max_pct: the worst loss of either kind among the other cameras, absent alone.
+	WarningPhoneDropsCamera: {Required: []string{ParamCamera, ParamDropPct}, Optional: []string{ParamOthersMaxPct}},
 }
 
 // WarningParamSpecFor returns the params a code carries. A code with no entry — one whose
