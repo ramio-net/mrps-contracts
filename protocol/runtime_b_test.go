@@ -116,6 +116,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		WarningSRTLatencyMismatch, WarningStartSpikeCured, WarningStartSpikeUncured,
 		WarningPacketLossPark, WarningPacketLossCamera, WarningOther,
 		WarningCalibDisturbedCured, WarningCalibDisturbedUncured, WarningPhoneDropsCamera,
+		WarningConfigChangedOnSite,
 	} {
 		codes[c] = true
 	}
@@ -125,6 +126,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		ParamSettledRTTMs, ParamLateMs, ParamLossPct, ParamOthersMaxPct, ParamOfflineSec,
 		ParamSinceSyncSec, ParamFreshSec, ParamLimitMin, ParamMinutesLeft, ParamLastError,
 		ParamCalibRTTMs, ParamFloorMs, ParamErrorMs, ParamDropPct,
+		ParamSettings, ParamConfigVersion, ParamPlayoutMs, ParamCloudPlayoutMs,
 	} {
 		keys[k] = true
 	}
@@ -153,6 +155,41 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 	spec.Required[0] = "mutated"
 	if again, _ := WarningParamSpecFor(WarningPacketLossCamera); again.Required[0] == "mutated" {
 		t.Error("WarningParamSpecFor hands out the table itself; a caller could rewrite the contract")
+	}
+}
+
+// A vector for Console (v0.10.2): on Cloud's version 3, the person in the room lowered the
+// buffer to 360 and switched the live bitrate off. Version 3 is still what Edge echoes as
+// applied; this line is what tells Console the venue no longer runs it as sent.
+func TestConfigChangedOnSiteOnTheWire(t *testing.T) {
+	w := RuntimeWarning{
+		Code: WarningConfigChangedOnSite,
+		Params: map[string]string{
+			ParamSettings:       "operational.playout_delay_ms,operational.live_bitrate.enabled",
+			ParamConfigVersion:  "3",
+			ParamPlayoutMs:      "360",
+			ParamCloudPlayoutMs: "400",
+		},
+		Message: "settings changed on this Edge since MRPS Cloud version 3: buffer 360 ms (MRPS Cloud: 400 ms), live bitrate — they stay until MRPS Cloud sends a new version",
+	}
+	spec, ok := WarningParamSpecFor(w.Code)
+	if !ok {
+		t.Fatal("no param spec for config_changed_on_site")
+	}
+	allowed := map[string]bool{}
+	for _, k := range spec.Required {
+		allowed[k] = true
+		if _, ok := w.Params[k]; !ok {
+			t.Errorf("the vector lacks required param %q", k)
+		}
+	}
+	for _, k := range spec.Optional {
+		allowed[k] = true
+	}
+	for k := range w.Params {
+		if !allowed[k] {
+			t.Errorf("the vector carries %q, which the spec does not list", k)
+		}
 	}
 }
 
