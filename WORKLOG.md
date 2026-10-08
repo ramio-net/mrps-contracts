@@ -1,5 +1,19 @@
 # MRPS Contracts Worklog
 
+## 2026-10-09: v0.10.2 — config_changed_on_site (additive)
+
+- Branch feat/v0.10.2-config-changed-on-site from main 05b9a06. Only additions: one code,
+  four keys, one value form (lists). A reader on v0.10.1 shows the new code by its message.
+- Owner's decision of 09.10: on a venue linked to Cloud, the person in the room may change
+  a setting Cloud delivered, and it stays until Cloud sends a NEW version — Edge now
+  applies each version once instead of re-applying it on every sync, which turned every
+  panel knob back within ten seconds. The applied echo stays truthful (that version did
+  take effect); config_changed_on_site {settings, config_version, playout_ms?,
+  cloud_playout_ms?} says what has been changed on the Edge since, so Console can stop
+  saying "confirmed" over values the venue no longer runs.
+- settings is a list of sessioncfg.Config JSON paths ("operational.playout_delay_ms").
+  playout_ms and cloud_playout_ms travel together, only when the buffer is among them.
+
 ## 2026-10-07: v0.10.1 — three warning codes from the broadcast of 07.10 (additive)
 
 - Branch feat/v0.10.1-field-lessons from main 70b6332. Only additions: new codes and keys,

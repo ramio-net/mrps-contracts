@@ -52,6 +52,14 @@ const (
 	// own bitrate, or getting it closer to the router.
 	WarningPhoneDropsCamera = "phone_drops_camera"
 
+	// v0.10.2, owner's decision of 09.10.2026: on a venue linked to Cloud, the person in the
+	// room may change a setting Cloud delivered, and the change stays until Cloud sends a
+	// NEW version — Edge applies each version once, not on every sync. The version Edge
+	// echoes as applied is still the one that took effect; this line says what has been
+	// changed on the Edge since, so Console can say "running X · changed on Edge" instead of
+	// "confirmed" over values the venue is no longer running.
+	WarningConfigChangedOnSite = "config_changed_on_site"
+
 	// WarningOther is a line this contract has no code for yet. Show its message.
 	WarningOther = "other"
 )
@@ -63,7 +71,8 @@ const (
 //   - percentages: one decimal with a dot ("12.5");
 //   - moments: RFC 3339 in UTC ("2026-09-29T06:20:16Z");
 //   - camera: the name the Edge panel shows for it (slot label, nickname, or short id) —
-//     free text, shown as is.
+//     free text, shown as is;
+//   - lists: comma-separated, no spaces ("operational.frame_sync,operational.live_bitrate.enabled").
 const (
 	ParamCamera       = "camera"
 	ParamCameras      = "cameras"        // the camera limit now in force
@@ -85,6 +94,12 @@ const (
 	ParamFloorMs      = "floor_ms"       // what an undisturbed measurement takes (v0.10.1)
 	ParamErrorMs      = "error_ms"       // up to how far the camera's clock may be off (v0.10.1)
 	ParamDropPct      = "drop_pct"       // share of frames the phone discarded before sending (v0.10.1)
+	// The settings changed on the Edge since Cloud's version took effect, as a list of their
+	// paths in sessioncfg.Config's JSON ("operational.playout_delay_ms") (v0.10.2).
+	ParamSettings       = "settings"
+	ParamConfigVersion  = "config_version"   // the Cloud config version they were changed from (v0.10.2)
+	ParamPlayoutMs      = "playout_ms"       // the buffer the Edge runs on now (v0.10.2)
+	ParamCloudPlayoutMs = "cloud_playout_ms" // the buffer that version put in force (v0.10.2)
 )
 
 // WarningParamSpec is what one code carries: Required keys are always sent with it,
@@ -124,6 +139,10 @@ var warningParams = map[string]WarningParamSpec{
 	WarningCalibDisturbedUncured: {Required: []string{ParamCamera, ParamCalibRTTMs, ParamFloorMs, ParamErrorMs}},
 	// others_max_pct: the worst loss of either kind among the other cameras, absent alone.
 	WarningPhoneDropsCamera: {Required: []string{ParamCamera, ParamDropPct}, Optional: []string{ParamOthersMaxPct}},
+	// playout_ms and cloud_playout_ms travel together, and only when the buffer is among
+	// the settings changed.
+	WarningConfigChangedOnSite: {Required: []string{ParamSettings, ParamConfigVersion},
+		Optional: []string{ParamPlayoutMs, ParamCloudPlayoutMs}},
 }
 
 // WarningParamSpecFor returns the params a code carries. A code with no entry — one whose
