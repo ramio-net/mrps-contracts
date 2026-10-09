@@ -116,7 +116,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		WarningSRTLatencyMismatch, WarningStartSpikeCured, WarningStartSpikeUncured,
 		WarningPacketLossPark, WarningPacketLossCamera, WarningOther,
 		WarningCalibDisturbedCured, WarningCalibDisturbedUncured, WarningPhoneDropsCamera,
-		WarningConfigChangedOnSite,
+		WarningConfigChangedOnSite, WarningLoneCameraLagging,
 	} {
 		codes[c] = true
 	}
@@ -127,6 +127,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		ParamSinceSyncSec, ParamFreshSec, ParamLimitMin, ParamMinutesLeft, ParamLastError,
 		ParamCalibRTTMs, ParamFloorMs, ParamErrorMs, ParamDropPct,
 		ParamSettings, ParamConfigVersion, ParamPlayoutMs, ParamCloudPlayoutMs,
+		ParamLagMs, ParamSuggestedPlayoutMs, ParamToVMixMs,
 	} {
 		keys[k] = true
 	}
@@ -187,6 +188,34 @@ func TestConfigChangedOnSiteOnTheWire(t *testing.T) {
 		allowed[k] = true
 	}
 	for k := range w.Params {
+		if !allowed[k] {
+			t.Errorf("the vector carries %q, which the spec does not list", k)
+		}
+	}
+}
+
+// A vector for Console (v0.10.3): Solo on buffer 200, a slow phone running 85 ms behind its
+// place in the schedule — no freezes, 305 ms to vMix instead of 220, cured by 300.
+func TestLoneCameraLaggingOnTheWire(t *testing.T) {
+	params := map[string]string{
+		ParamCamera: "CAM-1", ParamLagMs: "85", ParamPlayoutMs: "200",
+		ParamSuggestedPlayoutMs: "300", ParamToVMixMs: "305",
+	}
+	spec, ok := WarningParamSpecFor(WarningLoneCameraLagging)
+	if !ok {
+		t.Fatal("no param spec for lone_camera_lagging")
+	}
+	allowed := map[string]bool{}
+	for _, k := range spec.Required {
+		allowed[k] = true
+		if _, ok := params[k]; !ok {
+			t.Errorf("the vector lacks required param %q", k)
+		}
+	}
+	for _, k := range spec.Optional {
+		allowed[k] = true
+	}
+	for k := range params {
 		if !allowed[k] {
 			t.Errorf("the vector carries %q, which the spec does not list", k)
 		}

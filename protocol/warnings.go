@@ -60,6 +60,12 @@ const (
 	// "confirmed" over values the venue is no longer running.
 	WarningConfigChangedOnSite = "config_changed_on_site"
 
+	// v0.10.3, the Solo preset (one camera on the schedule, no lag bound): a slow phone does
+	// not freeze on a short buffer, it runs steadily behind its place in the schedule. The
+	// delay to vMix is then longer than the preset promises and outside audio drifts off the
+	// lips, with every freeze counter at zero. Named with the buffer that would cure it.
+	WarningLoneCameraLagging = "lone_camera_lagging"
+
 	// WarningOther is a line this contract has no code for yet. Show its message.
 	WarningOther = "other"
 )
@@ -100,6 +106,10 @@ const (
 	ParamConfigVersion  = "config_version"   // the Cloud config version they were changed from (v0.10.2)
 	ParamPlayoutMs      = "playout_ms"       // the buffer the Edge runs on now (v0.10.2)
 	ParamCloudPlayoutMs = "cloud_playout_ms" // the buffer that version put in force (v0.10.2)
+	// lone_camera_lagging (v0.10.3); the buffer itself travels as playout_ms.
+	ParamLagMs              = "lag_ms"               // how far behind its place in the schedule the camera runs
+	ParamSuggestedPlayoutMs = "suggested_playout_ms" // the buffer that would cover the lag
+	ParamToVMixMs           = "to_vmix_ms"           // the delay to vMix now, with the lag in it
 )
 
 // WarningParamSpec is what one code carries: Required keys are always sent with it,
@@ -143,6 +153,9 @@ var warningParams = map[string]WarningParamSpec{
 	// the settings changed.
 	WarningConfigChangedOnSite: {Required: []string{ParamSettings, ParamConfigVersion},
 		Optional: []string{ParamPlayoutMs, ParamCloudPlayoutMs}},
+	// to_vmix_ms only where Edge knows the output SRT latency it adds.
+	WarningLoneCameraLagging: {Required: []string{ParamCamera, ParamLagMs, ParamPlayoutMs, ParamSuggestedPlayoutMs},
+		Optional: []string{ParamToVMixMs}},
 }
 
 // WarningParamSpecFor returns the params a code carries. A code with no entry — one whose
