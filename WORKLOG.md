@@ -1,5 +1,14 @@
 # MRPS Contracts Worklog
 
+## 2026-10-09: v0.10.3 — lone_camera_lagging (additive)
+
+- Branch feat/v0.10.3-lone-camera-lagging from main a66028b. One code, three keys.
+- The Solo preset runs one camera on the schedule with no lag bound (Edge PR #4): a slow
+  phone on a short buffer does not freeze, it runs steadily late. lone_camera_lagging
+  {camera, lag_ms, playout_ms, suggested_playout_ms, to_vmix_ms?} names the lag, the buffer
+  now and the buffer that would cure it. playout_ms reuses the v0.10.2 key rather than a
+  second name for the same number (the Solo chat had proposed buffer_ms).
+
 ## 2026-10-09: v0.10.2 — config_changed_on_site (additive)
 
 - Branch feat/v0.10.2-config-changed-on-site from main 05b9a06. Only additions: one code,
