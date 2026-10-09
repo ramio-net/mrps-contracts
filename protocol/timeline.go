@@ -56,7 +56,10 @@ type CameraTimeline struct {
 	DeviceKey string           `json:"device_key"`
 	SlotIndex int              `json:"slot_index"`
 	Label     string           `json:"label,omitempty"`
-	Buckets   []TimelineBucket `json:"buckets"`
+	// Name: the phone's name as RuntimeCamera.Name, the last one seen in the session
+	// (v0.10.4). Absent from an older Edge.
+	Name    string           `json:"name,omitempty"`
+	Buckets []TimelineBucket `json:"buckets"`
 }
 
 // TimelineBucket is one minute of one camera.

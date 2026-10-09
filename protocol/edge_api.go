@@ -325,6 +325,12 @@ type RuntimeCamera struct {
 	SlotIndex    int    `json:"slot_index"`
 	ConnectionID string `json:"connection_id,omitempty"`
 	Status       string `json:"status"`
+	// Name is the phone's own name from its Android settings ("Redmi 15"), or its model
+	// when the phone sends none (v0.10.4). Absent from an older Edge: show the device id as
+	// before. Not an identity — it changes when the owner renames the phone; DeviceID is
+	// what to key on. On Xiaomi phones the device id starts with a model code
+	// ("25062RN2DY-…"), which is why the readable name travels separately.
+	Name string `json:"name,omitempty"`
 }
 
 type RuntimeAUX struct {
