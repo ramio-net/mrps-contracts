@@ -1,5 +1,14 @@
 # MRPS Contracts Worklog
 
+## 2026-10-09: v0.10.5 — auto_bitrate_at_floor (additive)
+
+- Branch feat/v0.10.5-auto-bitrate-at-floor from main ee2acf8. One code, two keys.
+- MRPS Camera 0.1.12 cuts its own bitrate on a growing send queue (plan of 09.10, owner
+  approved), down to a floor (1500 by default). auto_bitrate_at_floor {camera, bitrate_kbps,
+  backlog_ms, drop_pct?}: at the floor and the queue still grows — bitrate is spent, the
+  cure is the phone's place. phone_drops_camera says "lower this camera's bitrate", which the
+  automatic has already done.
+
 ## 2026-10-09: v0.10.4 — the phone's name on cameras (additive)
 
 - Branch feat/v0.10.4-camera-name from main c9ac9c7. RuntimeCamera.Name and

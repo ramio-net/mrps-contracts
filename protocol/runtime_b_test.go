@@ -116,7 +116,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		WarningSRTLatencyMismatch, WarningStartSpikeCured, WarningStartSpikeUncured,
 		WarningPacketLossPark, WarningPacketLossCamera, WarningOther,
 		WarningCalibDisturbedCured, WarningCalibDisturbedUncured, WarningPhoneDropsCamera,
-		WarningConfigChangedOnSite, WarningLoneCameraLagging,
+		WarningConfigChangedOnSite, WarningLoneCameraLagging, WarningAutoBitrateAtFloor,
 	} {
 		codes[c] = true
 	}
@@ -127,7 +127,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		ParamSinceSyncSec, ParamFreshSec, ParamLimitMin, ParamMinutesLeft, ParamLastError,
 		ParamCalibRTTMs, ParamFloorMs, ParamErrorMs, ParamDropPct,
 		ParamSettings, ParamConfigVersion, ParamPlayoutMs, ParamCloudPlayoutMs,
-		ParamLagMs, ParamSuggestedPlayoutMs, ParamToVMixMs,
+		ParamLagMs, ParamSuggestedPlayoutMs, ParamToVMixMs, ParamBitrateKbps, ParamBacklogMs,
 	} {
 		keys[k] = true
 	}
@@ -188,6 +188,34 @@ func TestConfigChangedOnSiteOnTheWire(t *testing.T) {
 		allowed[k] = true
 	}
 	for k := range w.Params {
+		if !allowed[k] {
+			t.Errorf("the vector carries %q, which the spec does not list", k)
+		}
+	}
+}
+
+// A vector for Console (v0.10.5): the steadicam of 07.10 with the automatic on — already cut to
+// the floor of 1500, its send queue still at 690 ms and frames being discarded. Bitrate is
+// spent; the cure is the phone's place.
+func TestAutoBitrateAtFloorOnTheWire(t *testing.T) {
+	params := map[string]string{
+		ParamCamera: "CAM-2", ParamBitrateKbps: "1500", ParamBacklogMs: "690", ParamDropPct: "12.5",
+	}
+	spec, ok := WarningParamSpecFor(WarningAutoBitrateAtFloor)
+	if !ok {
+		t.Fatal("no param spec for auto_bitrate_at_floor")
+	}
+	allowed := map[string]bool{}
+	for _, k := range spec.Required {
+		allowed[k] = true
+		if _, ok := params[k]; !ok {
+			t.Errorf("the vector lacks required param %q", k)
+		}
+	}
+	for _, k := range spec.Optional {
+		allowed[k] = true
+	}
+	for k := range params {
 		if !allowed[k] {
 			t.Errorf("the vector carries %q, which the spec does not list", k)
 		}
