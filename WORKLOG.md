@@ -1,5 +1,13 @@
 # MRPS Contracts Worklog
 
+## 2026-10-09: v0.10.4 — the phone's name on cameras (additive)
+
+- Branch feat/v0.10.4-camera-name from main c9ac9c7. RuntimeCamera.Name and
+  CameraTimeline.Name, both omitempty: the phone's name from its Android settings
+  ("Redmi 15"), or its model when the phone sends none. MRPS Camera 0.1.11 sends it in
+  JOIN (device_name); on Xiaomi the device id itself starts with a model code
+  ("25062RN2DY-…"), so Console showed codes. Not an identity — DeviceID stays the key.
+
 ## 2026-10-09: v0.10.3 — lone_camera_lagging (additive)
 
 - Branch feat/v0.10.3-lone-camera-lagging from main a66028b. One code, three keys.

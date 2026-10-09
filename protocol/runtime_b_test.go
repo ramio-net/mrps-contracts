@@ -222,6 +222,23 @@ func TestLoneCameraLaggingOnTheWire(t *testing.T) {
 	}
 }
 
+// v0.10.4: the phone's name travels next to its id, and an Edge that has none sends the
+// camera exactly as before.
+func TestCameraNameIsOptionalOnTheWire(t *testing.T) {
+	old, _ := json.Marshal(RuntimeCamera{DeviceID: "25062RN2DY-8eac4893", Status: "streaming"})
+	if strings.Contains(string(old), `"name"`) {
+		t.Fatalf("a camera with no name grew a name key: %s", old)
+	}
+	named, _ := json.Marshal(RuntimeCamera{DeviceID: "25062RN2DY-8eac4893", Status: "streaming", Name: "Redmi 15"})
+	if !strings.Contains(string(named), `"name":"Redmi 15"`) {
+		t.Fatalf("name missing: %s", named)
+	}
+	tl, _ := json.Marshal(CameraTimeline{DeviceKey: "25062RN2DY-8eac4893", Name: "Redmi 15", Buckets: []TimelineBucket{}})
+	if !strings.Contains(string(tl), `"name":"Redmi 15"`) {
+		t.Fatalf("timeline camera name missing: %s", tl)
+	}
+}
+
 // supported_features rides the signed sync; an Edge that declares nothing sends the request
 // it always did.
 func TestSupportedFeaturesAreDeclaredNotInferred(t *testing.T) {
