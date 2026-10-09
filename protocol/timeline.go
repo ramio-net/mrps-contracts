@@ -53,9 +53,9 @@ type Timeline struct {
 // CameraTimeline is one camera's series. Buckets cover the whole session, including
 // the time this camera was absent — see TimelineBucket.StreamingSec.
 type CameraTimeline struct {
-	DeviceKey string           `json:"device_key"`
-	SlotIndex int              `json:"slot_index"`
-	Label     string           `json:"label,omitempty"`
+	DeviceKey string `json:"device_key"`
+	SlotIndex int    `json:"slot_index"`
+	Label     string `json:"label,omitempty"`
 	// Name: the phone's name as RuntimeCamera.Name, the last one seen in the session
 	// (v0.10.4). Absent from an older Edge.
 	Name    string           `json:"name,omitempty"`
