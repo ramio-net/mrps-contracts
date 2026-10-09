@@ -66,6 +66,13 @@ const (
 	// lips, with every freeze counter at zero. Named with the buffer that would cure it.
 	WarningLoneCameraLagging = "lone_camera_lagging"
 
+	// v0.10.5, MRPS Camera's automatic bitrate (plan of 09.10.2026): the phone already cut its
+	// own bitrate to the floor and its send queue still grows. Past this point lowering the
+	// bitrate cures nothing more — the cure is the phone's place (closer to the router), and
+	// "lower this camera's bitrate" (phone_drops_camera) would send the operator to a knob the
+	// automatic has already turned all the way.
+	WarningAutoBitrateAtFloor = "auto_bitrate_at_floor"
+
 	// WarningOther is a line this contract has no code for yet. Show its message.
 	WarningOther = "other"
 )
@@ -110,6 +117,9 @@ const (
 	ParamLagMs              = "lag_ms"               // how far behind its place in the schedule the camera runs
 	ParamSuggestedPlayoutMs = "suggested_playout_ms" // the buffer that would cover the lag
 	ParamToVMixMs           = "to_vmix_ms"           // the delay to vMix now, with the lag in it
+	// auto_bitrate_at_floor (v0.10.5).
+	ParamBitrateKbps = "bitrate_kbps" // the bitrate the phone holds now: the automatic's floor
+	ParamBacklogMs   = "backlog_ms"   // the phone's send queue, still growing at the floor
 )
 
 // WarningParamSpec is what one code carries: Required keys are always sent with it,
@@ -156,6 +166,9 @@ var warningParams = map[string]WarningParamSpec{
 	// to_vmix_ms only where Edge knows the output SRT latency it adds.
 	WarningLoneCameraLagging: {Required: []string{ParamCamera, ParamLagMs, ParamPlayoutMs, ParamSuggestedPlayoutMs},
 		Optional: []string{ParamToVMixMs}},
+	// drop_pct when the phone also discards frames at the floor.
+	WarningAutoBitrateAtFloor: {Required: []string{ParamCamera, ParamBitrateKbps, ParamBacklogMs},
+		Optional: []string{ParamDropPct}},
 }
 
 // WarningParamSpecFor returns the params a code carries. A code with no entry — one whose
