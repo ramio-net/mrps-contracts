@@ -117,6 +117,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		WarningPacketLossPark, WarningPacketLossCamera, WarningOther,
 		WarningCalibDisturbedCured, WarningCalibDisturbedUncured, WarningPhoneDropsCamera,
 		WarningConfigChangedOnSite, WarningLoneCameraLagging, WarningAutoBitrateAtFloor,
+		WarningVideoChangeDeferred, WarningCameraVideoRefused,
 	} {
 		codes[c] = true
 	}
@@ -128,6 +129,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		ParamCalibRTTMs, ParamFloorMs, ParamErrorMs, ParamDropPct,
 		ParamSettings, ParamConfigVersion, ParamPlayoutMs, ParamCloudPlayoutMs,
 		ParamLagMs, ParamSuggestedPlayoutMs, ParamToVMixMs, ParamBitrateKbps, ParamBacklogMs,
+		ParamVideo, ParamNextVideo, ParamCameraVideo,
 	} {
 		keys[k] = true
 	}
@@ -218,6 +220,44 @@ func TestAutoBitrateAtFloorOnTheWire(t *testing.T) {
 	for k := range params {
 		if !allowed[k] {
 			t.Errorf("the vector carries %q, which the spec does not list", k)
+		}
+	}
+}
+
+// Vectors for Console (v0.10.6), from the live run of 10.10: Cloud's version 3 moved the venue
+// from 720p to 1080p mid-broadcast, and Redmi 15 reconnected with the old video. With the
+// broadcast's video held, the first line stands until the broadcast ends; the second is the
+// phone whose app does not take the video Edge sends back with the refusal.
+func TestVideoKeysOnTheWire(t *testing.T) {
+	if got := FormatVideoParam(1920, 1080, 30, 5000); got != "1920x1080@30/5000" {
+		t.Fatalf("FormatVideoParam = %q, want 1920x1080@30/5000", got)
+	}
+	for code, params := range map[string]map[string]string{
+		WarningVideoChangeDeferred: {
+			ParamVideo: "1280x720@30/3300", ParamNextVideo: "1920x1080@30/5000", ParamConfigVersion: "3",
+		},
+		WarningCameraVideoRefused: {
+			ParamCamera: "Redmi 15", ParamCameraVideo: "1280x720@30/3300", ParamVideo: "1920x1080@30/5000",
+		},
+	} {
+		spec, ok := WarningParamSpecFor(code)
+		if !ok {
+			t.Fatalf("no param spec for %s", code)
+		}
+		allowed := map[string]bool{}
+		for _, k := range spec.Required {
+			allowed[k] = true
+			if _, ok := params[k]; !ok {
+				t.Errorf("%s: the vector lacks required param %q", code, k)
+			}
+		}
+		for _, k := range spec.Optional {
+			allowed[k] = true
+		}
+		for k := range params {
+			if !allowed[k] {
+				t.Errorf("%s: the vector carries %q, which the spec does not list", code, k)
+			}
 		}
 	}
 }
