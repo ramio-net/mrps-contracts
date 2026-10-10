@@ -1,5 +1,7 @@
 package protocol
 
+import "strconv"
+
 // Codes of the warnings an Edge lists on its own panel and reports in EdgeRuntime.Warnings
 // (contract v0.10.0). Each names one line of that list; the line's text travels next to it
 // as RuntimeWarning.Message and carries the numbers.
@@ -73,6 +75,20 @@ const (
 	// automatic has already turned all the way.
 	WarningAutoBitrateAtFloor = "auto_bitrate_at_floor"
 
+	// v0.10.6, live run of 10.10.2026: Cloud delivered a new video (720p → 1080p) in the middle
+	// of a broadcast, Edge put it in force at once, and the next camera to reconnect was refused
+	// as a mismatch — the phone still had the old video — and stayed off air until MRPS Camera
+	// was restarted, after which the park ran 1080p and 720p side by side in vMix. Edge now keeps
+	// the broadcast's video from its first camera to its end, wherever a new one comes from
+	// (Cloud or the Edge's own panel); the new one takes effect with the next broadcast. This
+	// line says so, so neither the Edge page nor Console shows the new video as running.
+	WarningVideoChangeDeferred = "video_change_deferred"
+	// A phone came with a video other than the one this Edge runs and was refused. Between
+	// broadcasts it is a phone whose app kept yesterday's settings; MRPS Camera before 0.1.16
+	// does not take the video Edge sends back with the refusal, and stays out until it is
+	// restarted — which nothing else on any screen would say.
+	WarningCameraVideoRefused = "camera_video_refused"
+
 	// WarningOther is a line this contract has no code for yet. Show its message.
 	WarningOther = "other"
 )
@@ -85,7 +101,8 @@ const (
 //   - moments: RFC 3339 in UTC ("2026-09-29T06:20:16Z");
 //   - camera: the name the Edge panel shows for it (slot label, nickname, or short id) —
 //     free text, shown as is;
-//   - lists: comma-separated, no spaces ("operational.frame_sync,operational.live_bitrate.enabled").
+//   - lists: comma-separated, no spaces ("operational.frame_sync,operational.live_bitrate.enabled");
+//   - video: width x height @ fps / kbps, no spaces ("1920x1080@30/5000") — FormatVideoParam (v0.10.6).
 const (
 	ParamCamera       = "camera"
 	ParamCameras      = "cameras"        // the camera limit now in force
@@ -120,7 +137,16 @@ const (
 	// auto_bitrate_at_floor (v0.10.5).
 	ParamBitrateKbps = "bitrate_kbps" // the bitrate the phone holds now: the automatic's floor
 	ParamBacklogMs   = "backlog_ms"   // the phone's send queue, still growing at the floor
+	// video_change_deferred and camera_video_refused (v0.10.6).
+	ParamVideo       = "video"        // the video this Edge runs and asks of every camera now
+	ParamNextVideo   = "next_video"   // the video that takes effect when the broadcast ends
+	ParamCameraVideo = "camera_video" // the video the refused phone came with
 )
+
+// FormatVideoParam writes a video in the one form the video keys carry ("1920x1080@30/5000").
+func FormatVideoParam(width, height, fps, bitrateKbps int) string {
+	return strconv.Itoa(width) + "x" + strconv.Itoa(height) + "@" + strconv.Itoa(fps) + "/" + strconv.Itoa(bitrateKbps)
+}
 
 // WarningParamSpec is what one code carries: Required keys are always sent with it,
 // Optional ones only when they exist (the second camera to compare with, an error text).
@@ -169,6 +195,10 @@ var warningParams = map[string]WarningParamSpec{
 	// drop_pct when the phone also discards frames at the floor.
 	WarningAutoBitrateAtFloor: {Required: []string{ParamCamera, ParamBitrateKbps, ParamBacklogMs},
 		Optional: []string{ParamDropPct}},
+	// config_version when the new video came from Cloud; absent when it was set on the Edge.
+	WarningVideoChangeDeferred: {Required: []string{ParamVideo, ParamNextVideo}, Optional: []string{ParamConfigVersion}},
+	// camera: the phone's own name from its JOIN, or its model — a refused phone has no slot.
+	WarningCameraVideoRefused: {Required: []string{ParamCamera, ParamCameraVideo, ParamVideo}},
 }
 
 // WarningParamSpecFor returns the params a code carries. A code with no entry — one whose

@@ -1,5 +1,17 @@
 # MRPS Contracts Worklog
 
+## 2026-10-10: v0.10.6 — the broadcast's video is held to its end (additive)
+
+- Branch feat/v0.10.6-video-held-for-broadcast from main 1d9c52d. Two codes, three keys, one
+  value form (video: "1920x1080@30/5000", FormatVideoParam).
+- Live run of 10.10: Cloud's version 3 moved the venue from 720p to 1080p mid-broadcast, Edge
+  put it in force at once, Redmi 15 reconnected with the old video, was refused as a mismatch
+  and stayed off air until MRPS Camera was restarted; then 1080p and 720p ran side by side.
+  Edge now keeps the broadcast's video from its first camera to its end, from Cloud or its own
+  panel alike. video_change_deferred {video, next_video, config_version?} says the new video
+  waits for the next broadcast; camera_video_refused {camera, camera_video, video} names a phone
+  that came with other video (an app before 0.1.16 does not take what Edge sends back).
+
 ## 2026-10-09: v0.10.5 — auto_bitrate_at_floor (additive)
 
 - Branch feat/v0.10.5-auto-bitrate-at-floor from main ee2acf8. One code, two keys.
