@@ -45,7 +45,17 @@ type LiveBitrate struct {
 	MinKbps  int  `json:"min_kbps"`
 	MaxKbps  int  `json:"max_kbps"`
 	StepKbps int  `json:"step_kbps"`
+	// Auto runs MRPS Camera's own bitrate automat: each phone lowers its bitrate from its send
+	// queue and raises it back, within Edge's bounds (v0.10.7, owner's decision of 10.10.2026 after
+	// phases A–C: on by default in every preset — "better to lower the quality a little and deliver
+	// the picture than to lose it"). A pointer because absent means ON: a config written before
+	// this field, or by a writer that does not know it, keeps the automat on. Only an explicit
+	// false — the "Manual" preset — turns it off. Read it through AutoOn.
+	Auto *bool `json:"auto,omitempty"`
 }
+
+// AutoOn reports whether the bitrate automat runs: on unless the config says false.
+func (l LiveBitrate) AutoOn() bool { return l.Auto == nil || *l.Auto }
 
 type Operational struct {
 	PlayoutDelayMs int         `json:"playout_delay_ms"`
@@ -131,9 +141,16 @@ func DefaultOperational(v Video) Operational {
 			MinKbps:  1500,
 			MaxKbps:  8500,
 			StepKbps: 500,
+			// Written out, so a default config says what it does rather than relying on the
+			// absent-means-on rule. A fresh pointer per call: a caller setting it to false must
+			// not turn the automat off in every other default.
+			Auto: BoolPtr(true),
 		},
 	}
 }
+
+// BoolPtr returns a pointer to a new copy of v, for optional fields such as LiveBitrate.Auto.
+func BoolPtr(v bool) *bool { return &v }
 
 // RecommendedPlayoutMs is the starting playout delay for a video config: more
 // resolution and bitrate mean more airtime pressure, more arrival jitter, and more

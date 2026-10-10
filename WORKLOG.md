@@ -1,5 +1,16 @@
 # MRPS Contracts Worklog
 
+## 2026-10-10: v0.10.7 — live_bitrate.auto, the bitrate automat on by default (additive)
+
+- Branch feat/v0.10.7-live-bitrate-auto from main d75627e. One optional field and a reader.
+- Owner's decision of 10.10 after phases A–C of MRPS Camera's bitrate automat (A: encoders follow
+  in 1–2 s; B: a clean hour, zero cuts; C: at the edge of coverage the park's repeated frames fell
+  ~7×): on by default in every preset. sessioncfg.LiveBitrate.Auto *bool — absent means ON, so a
+  config written before the field keeps the automat on; only an explicit false (the "Manual"
+  preset) turns it off. LiveBitrate.AutoOn() reads it; DefaultOperational writes auto:true with a
+  fresh pointer per call (BoolPtr). A setting changed on site is reported under the path
+  "operational.live_bitrate.auto" in config_changed_on_site.
+
 ## 2026-10-10: v0.10.6 — the broadcast's video is held to its end (additive)
 
 - Branch feat/v0.10.6-video-held-for-broadcast from main 1d9c52d. Two codes, three keys, one
