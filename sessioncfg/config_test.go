@@ -1,6 +1,8 @@
 package sessioncfg
 
 import (
+	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -26,6 +28,35 @@ func TestDefaultTransportIsLive(t *testing.T) {
 	}
 	if err := Validate(cfg, p); err != nil {
 		t.Fatal(err)
+	}
+}
+
+// v0.10.7: the bitrate automat is on unless a config says false. A config from before the
+// field (or from a writer that does not know it) keeps it on; the default says so explicitly.
+func TestLiveBitrateAutoIsOnUnlessSaidOff(t *testing.T) {
+	var old Operational
+	if err := json.Unmarshal([]byte(`{"live_bitrate":{"enabled":true,"min_kbps":1500,"max_kbps":8500,"step_kbps":500}}`), &old); err != nil {
+		t.Fatal(err)
+	}
+	if !old.LiveBitrate.AutoOn() {
+		t.Fatal("a config without live_bitrate.auto turned the automat off")
+	}
+	var manual Operational
+	if err := json.Unmarshal([]byte(`{"live_bitrate":{"enabled":true,"auto":false}}`), &manual); err != nil {
+		t.Fatal(err)
+	}
+	if manual.LiveBitrate.AutoOn() {
+		t.Fatal("an explicit auto:false left the automat on")
+	}
+	def := DefaultOperational(Video{Height: 1080, BitrateKbps: 5000})
+	raw, _ := json.Marshal(def.LiveBitrate)
+	if !strings.Contains(string(raw), `"auto":true`) {
+		t.Fatalf("the default does not say auto:true: %s", raw)
+	}
+	// Each default owns its pointer: switching one off must not switch off the next.
+	*def.LiveBitrate.Auto = false
+	if !DefaultOperational(Video{Height: 1080, BitrateKbps: 5000}).LiveBitrate.AutoOn() {
+		t.Fatal("turning one default's automat off turned it off in the next default")
 	}
 }
 
