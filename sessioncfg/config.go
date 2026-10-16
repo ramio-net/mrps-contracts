@@ -122,19 +122,24 @@ func DefaultForProfile(profile capability.Profile) Config {
 	}
 }
 
+// DefaultOperational is "Выезд" (On location), the preset that guarantees the most, since
+// v0.10.8 (16.10.2026). Before that it switched on soft sync and the automatic buffer
+// raise, neither of them field-proven, while every preset Cloud offers has both off: a
+// config built from this default — a production's session config, for one — would have
+// turned on two untested mechanisms that no preset ever asked for.
 func DefaultOperational(v Video) Operational {
 	return Operational{
 		PlayoutDelayMs: RecommendedPlayoutMs(v),
 		FrameSync:      true,
 		SoftSync: SoftSync{
-			Enabled:  true,
+			Enabled:  false,
 			WindowMs: 3000,
 			RateMs:   10,
 		},
 		Adaptation: Adaptation{
 			Slew:        true,
 			RequestIDR:  true,
-			PlayoutDrop: true,
+			PlayoutDrop: false,
 		},
 		LiveBitrate: LiveBitrate{
 			Enabled:  true,

@@ -1,5 +1,16 @@
 # MRPS Contracts Worklog
 
+## 2026-10-16: v0.10.8 — the default is "Выезд" (values only, no field or code change)
+
+- Branch feat/v0.10.8-defaults-are-field from main. Launch plan step 1.7.
+- DefaultOperational had soft sync and the automatic buffer raise (adaptation.playout_drop)
+  on; neither is field-proven, and every preset Cloud offers ("Соло", "Студия", "Выезд") has
+  both off. Cloud builds a production's session config from DefaultForProfile, so such a
+  config switched them on with nobody choosing it. Now the default is "Выезд": 400 ms, frame
+  sync, slew, keyframe requests, the bitrate automat — soft sync and playout_drop off.
+- Edge does not call DefaultOperational; its own built-in values move to the same place in
+  the Edge PR of the same day (built-in buffer 400, the delivered version restored at start).
+
 ## 2026-10-10: v0.10.7 — live_bitrate.auto, the bitrate automat on by default (additive)
 
 - Branch feat/v0.10.7-live-bitrate-auto from main d75627e. One optional field and a reader.

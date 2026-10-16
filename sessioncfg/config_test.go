@@ -60,6 +60,19 @@ func TestLiveBitrateAutoIsOnUnlessSaidOff(t *testing.T) {
 	}
 }
 
+// The default is "Выезд" (v0.10.8): 400 ms, frame sync, slew and keyframe requests on, the
+// bitrate automat on — and soft sync and the automatic buffer raise off, as in every preset.
+func TestTheDefaultIsOnLocation(t *testing.T) {
+	for _, v := range []Video{{Height: 720, BitrateKbps: 3300}, {Height: 1080, BitrateKbps: 5000}} {
+		op := DefaultOperational(v)
+		if op.PlayoutDelayMs != 400 || !op.FrameSync || op.SoftSync.Enabled ||
+			!op.Adaptation.Slew || !op.Adaptation.RequestIDR || op.Adaptation.PlayoutDrop ||
+			!op.LiveBitrate.Enabled || !op.LiveBitrate.AutoOn() {
+			t.Fatalf("default for %dp/%d is not On location: %+v", v.Height, v.BitrateKbps, op)
+		}
+	}
+}
+
 func TestRejects24FPS(t *testing.T) {
 	p := capability.DemoProfile(time.Now())
 	cfg := DefaultForProfile(p)
