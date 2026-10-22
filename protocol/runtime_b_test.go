@@ -112,7 +112,7 @@ func TestParamSpecsNameOnlyKnownCodesAndKeys(t *testing.T) {
 		WarningCameraLimitReached, WarningSessionTimeLimit, WarningSessionEndingSoon,
 		WarningNegotiationRefused, WarningCloudNeverAccepted, WarningCloudSyncStale,
 		WarningCapabilityDegraded, WarningCapabilityExpired, WarningCapabilityInvalid,
-		WarningCapabilityUnreadable, WarningCapabilityMissing,
+		WarningCapabilityUnreadable, WarningCapabilityMissing, WarningCapabilityOutdated,
 		WarningSRTLatencyMismatch, WarningStartSpikeCured, WarningStartSpikeUncured,
 		WarningPacketLossPark, WarningPacketLossCamera, WarningOther,
 		WarningCalibDisturbedCured, WarningCalibDisturbedUncured, WarningPhoneDropsCamera,
