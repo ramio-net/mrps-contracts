@@ -1,5 +1,17 @@
 # MRPS Contracts Worklog
 
+## 2026-10-22: v0.10.9 — capability_outdated (additive, one warning code)
+
+- Branch feat/v0.10.9-capability-outdated from main 3842dc8. Asked for by Edge 0.7.0 (PR #38,
+  item 5 of `MRPS_EDGE_TRAY_TASK_2026-10-21.md`).
+- A profile Edge cannot read falls on one of two sides with opposite cures: newer than the
+  build (update Edge) or older (a sync — Cloud issues a current one). Both were sent as
+  capability_unreadable, and the reader's "update Edge" sent the second laptop of 21.10, on an
+  old test profile, to install the version it already had. capability_outdated names the older
+  side; capability_unreadable now means the newer one. Params: cameras, like its neighbours.
+- Edge before 0.7.0 keeps sending capability_unreadable for both sides: a reader keeps that
+  text neutral. No field, no wire change, nothing to migrate.
+
 ## 2026-10-16: v0.10.8 — the default is "Выезд" (values only, no field or code change)
 
 - Branch feat/v0.10.8-defaults-are-field from main. Launch plan step 1.7.

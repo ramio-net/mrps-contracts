@@ -30,8 +30,15 @@ const (
 	WarningCapabilityDegraded   = "capability_degraded"   // cache degraded: reduced limits until sync
 	WarningCapabilityExpired    = "capability_expired"    // cache expired: fallback limits
 	WarningCapabilityInvalid    = "capability_invalid"    // cache invalid: safe fallback limits
-	WarningCapabilityUnreadable = "capability_unreadable" // a profile schema this build cannot read
+	WarningCapabilityUnreadable = "capability_unreadable" // a profile schema newer than this build reads: update Edge
 	WarningCapabilityMissing    = "capability_missing"    // registered but no capability cache
+
+	// v0.10.9, the second laptop of 21.10.2026: a profile from a schema OLDER than this build
+	// reads. Until now Edge sent capability_unreadable for both sides and the reader said
+	// "update Edge" — to the version already installed. An old profile is cured by a sync:
+	// Cloud issues a current one. Edge before 0.7.0 still sends capability_unreadable for
+	// either kind, so a reader keeps that text neutral about which side it is.
+	WarningCapabilityOutdated = "capability_outdated"
 
 	// Cameras and the air.
 	WarningSRTLatencyMismatch = "srt_latency_mismatch" // a camera runs on a delay nobody assigned
@@ -171,6 +178,7 @@ var warningParams = map[string]WarningParamSpec{
 	WarningCapabilityExpired:    {Required: []string{ParamCameras}},
 	WarningCapabilityInvalid:    {Required: []string{ParamCameras}},
 	WarningCapabilityUnreadable: {Required: []string{ParamCameras}},
+	WarningCapabilityOutdated:   {Required: []string{ParamCameras}},
 
 	WarningSRTLatencyMismatch: {Required: []string{ParamCamera, ParamRunningMs, ParamAssignedMs}},
 	WarningStartSpikeCured:    {Required: []string{ParamCamera, ParamAt, ParamEarlyRTTMs, ParamSettledRTTMs, ParamLateMs}},
