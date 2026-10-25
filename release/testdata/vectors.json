@@ -1,0 +1,135 @@
+{
+  "cases": [
+    {
+      "name": "edge zip, valid",
+      "product": "ramio-edge",
+      "version": "0.7.0+12999d2",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "message": "ramio-release-v1\nramio-edge\n0.7.0+12999d2\n2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3\n",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": true
+    },
+    {
+      "name": "installer, valid",
+      "product": "ramio-edge-installer",
+      "version": "1.0.0",
+      "sha256": "3b712469abe46a29b4fdd9b2dfc18e5b46657e770d38be86ea2d66021d758d50",
+      "message": "ramio-release-v1\nramio-edge-installer\n1.0.0\n3b712469abe46a29b4fdd9b2dfc18e5b46657e770d38be86ea2d66021d758d50\n",
+      "signature": "Yfiz77u2dYIU1GMyI1/a2KU8yFiu3gvbyoo9OSxc1uYK5o0iUf0JPgwLlElaG/r+vZjTYwaSq64cbXMPr346Cg==",
+      "valid": true
+    },
+    {
+      "name": "another version",
+      "product": "ramio-edge",
+      "version": "0.7.1+aaaaaaa",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "message": "ramio-release-v1\nramio-edge\n0.7.1+aaaaaaa\n2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3\n",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": false,
+      "error": "bad_signature"
+    },
+    {
+      "name": "another product",
+      "product": "ramio-edge-installer",
+      "version": "0.7.0+12999d2",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "message": "ramio-release-v1\nramio-edge-installer\n0.7.0+12999d2\n2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3\n",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": false,
+      "error": "bad_signature"
+    },
+    {
+      "name": "another file",
+      "product": "ramio-edge",
+      "version": "0.7.0+12999d2",
+      "sha256": "3b712469abe46a29b4fdd9b2dfc18e5b46657e770d38be86ea2d66021d758d50",
+      "message": "ramio-release-v1\nramio-edge\n0.7.0+12999d2\n3b712469abe46a29b4fdd9b2dfc18e5b46657e770d38be86ea2d66021d758d50\n",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": false,
+      "error": "bad_signature"
+    },
+    {
+      "name": "one bit flipped in the signature",
+      "product": "ramio-edge",
+      "version": "0.7.0+12999d2",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "message": "ramio-release-v1\nramio-edge\n0.7.0+12999d2\n2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3\n",
+      "signature": "2/QiC7+BtZuPVzF7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": false,
+      "error": "bad_signature"
+    },
+    {
+      "name": "signed by an untrusted key",
+      "product": "ramio-edge",
+      "version": "0.7.0+12999d2",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "message": "ramio-release-v1\nramio-edge\n0.7.0+12999d2\n2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3\n",
+      "signature": "pTZ6Oi325BBpPgfwDKP1jDj6ivhPIVAS/qxKAWVt2c0YrBlvLi91SDAHd8DQMhlBj8XsHlFh2Z61O00C2C4iBA==",
+      "valid": false,
+      "error": "bad_signature"
+    },
+    {
+      "name": "uppercase hex digest",
+      "product": "ramio-edge",
+      "version": "0.7.0+12999d2",
+      "sha256": "2B4CCF1600BC3654E7F1C9EAE8D0C84E01B5AEDE26622B5931F49B6504F04DB3",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": false,
+      "error": "bad_digest"
+    },
+    {
+      "name": "line break in the version",
+      "product": "ramio-edge",
+      "version": "0.7.0\nramio-edge",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": false,
+      "error": "bad_version"
+    },
+    {
+      "name": "space in the version",
+      "product": "ramio-edge",
+      "version": "0.7.0 ",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": false,
+      "error": "bad_version"
+    },
+    {
+      "name": "uppercase product",
+      "product": "Ramio-Edge",
+      "version": "0.7.0+12999d2",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==",
+      "valid": false,
+      "error": "bad_product"
+    },
+    {
+      "name": "signature without padding",
+      "product": "ramio-edge",
+      "version": "0.7.0+12999d2",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "message": "ramio-release-v1\nramio-edge\n0.7.0+12999d2\n2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3\n",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw",
+      "valid": false,
+      "error": "bad_encoding"
+    },
+    {
+      "name": "signature with a trailing line break",
+      "product": "ramio-edge",
+      "version": "0.7.0+12999d2",
+      "sha256": "2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3",
+      "message": "ramio-release-v1\nramio-edge\n0.7.0+12999d2\n2b4ccf1600bc3654e7f1c9eae8d0c84e01b5aede26622b5931f49b6504f04db3\n",
+      "signature": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==\n",
+      "valid": false,
+      "error": "bad_encoding"
+    }
+  ],
+  "format": "ramio-release-v1",
+  "key_id": "03e0ac4cb45ea164",
+  "note": "TEST key derived from a public seed. Never trust it in a build that ships.",
+  "public_key_b64": "W3OWRHXvvmgMlM97bdFQkU5IZ0Di4jQuIvWenHcPlNc=",
+  "public_key_hex": "5b73964475efbe680c94cf7b6dd150914e486740e2e2342e22f59e9c770f94d7",
+  "sidecar_example": "2/QiC7+BtZuPVzB7aXNj1wnHddG6VSm36tD+y/XxdRkv8202/OeamEgk/Jbf0yRaZJtMxKLLrpAh/IRyQ3HcAw==\n",
+  "test_seed_hex": "cd23d64626bd1eed0866c377f67f6a3882c020ad051c926d93707e8f6b508a0b"
+}

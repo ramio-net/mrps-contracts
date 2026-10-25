@@ -1,5 +1,22 @@
 # MRPS Contracts Worklog
 
+## 2026-10-25: v0.10.10 — release: our own signature on published files (additive, new package)
+
+- Branch feat/v0.10.10-release-signature from main 8657af8. Owner's decision of 25.10: Edge has no Authenticode
+  certificate (not sold to a Russian company), so a web installer and an update button will download releases
+  by themselves (`multicam-synch/MRPS_EDGE_INSTALLER_TASK_2026-10-25.md`). Without a signature of our own,
+  control of the download server would mean control of every venue's Edge.
+- Signed text: `ramio-release-v1\n<product>\n<version>\n<sha256 lowercase hex>\n`; Ed25519; standard base64
+  with padding in latest.json `signature` and in `<file>.sig` (signature + one "\n"). Products today:
+  `ramio-edge`, `ramio-edge-installer`. Every field has one canonical spelling — uppercase hex, spaces or line
+  breaks in a version are rejected, not normalised. Verify tries every trusted key (rotation: old and new
+  trusted together first, as with p0). KeyID — first 8 bytes of SHA-256 of the key, a label for logs.
+- The private key never sits on a server: the owner signs on the build laptop when a kit is prepared.
+- `release/testdata/vectors.json` — TEST key from a public seed, 13 cases (2 valid, 11 failing with a named
+  reason). Go tests hold the package to them and check that the valid signatures are reproducible from the
+  seed; an independent Node verifier (crypto.verify, Ed25519) agreed on all 13 before the PR.
+- No change to existing packages; nothing to migrate.
+
 ## 2026-10-22: v0.10.9 — capability_outdated (additive, one warning code)
 
 - Branch feat/v0.10.9-capability-outdated from main 3842dc8. Asked for by Edge 0.7.0 (PR #38,
