@@ -1,5 +1,14 @@
 # MRPS Contracts Worklog
 
+## 2026-10-28: v0.10.11 — release: product `ramio-aux` (additive, one constant)
+
+- Branch feat/v0.10.11-release-aux from main fe1c2de. Ramio AUX ships to clients as a signed portable zip
+  (owner's decision of 28.10, `multicam-synch/RAMIO_AUX_RELEASE_TASK_2026-10-28.md` §0.2), signed with the same
+  owner key as Edge. `ProductAUX = "ramio-aux"`: a signature made for an AUX zip can never pass as an Edge one,
+  because the product is part of the signed text.
+- The message format, keys and vectors are unchanged. `release-sign` in Edge pins its own list of products and
+  takes the new name from this constant.
+
 ## 2026-10-25: v0.10.10 — release: our own signature on published files (additive, new package)
 
 - Branch feat/v0.10.10-release-signature from main 8657af8. Owner's decision of 25.10: Edge has no Authenticode
