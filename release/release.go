@@ -42,6 +42,7 @@ const Format = "ramio-release-v1"
 const (
 	ProductEdge          = "ramio-edge"           // the Edge release zip
 	ProductEdgeInstaller = "ramio-edge-installer" // RamioEdgeSetup.exe
+	ProductAUX           = "ramio-aux"            // the Ramio AUX portable zip (v0.10.11)
 )
 
 var (
